@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEX-OPS // Law Enforcement Decision & Legal Authority Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            tac: {
+              bg: '#090c10',
+              panel: '#0f141b',
+              card: '#151c26',
+              hover: '#1c2533',
+              border: '#232f40',
+              accent: '#38bdf8',
+              amber: '#f59e0b',
+              crimson: '#ef4444',
+              emerald: '#10b981',
+              purple: '#a855f7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #090c10; }
+    ::-webkit-scrollbar-thumb { background: #232f40; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+    .grid-bg {
+      background-image: radial-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="bg-tac-bg text-slate-200 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 h-screen flex flex-col overflow-hidden">
+
+  <!-- TOP COMMAND BAR -->
+  <header class="h-14 bg-tac-panel border-b border-tac-border px-4 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sky-400 font-mono font-bold text-sm">
+        §
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-bold tracking-wider text-sm uppercase text-white">LEX-OPS <span class="text-sky-400 font-mono">//</span> DECISION ENGINE</h1>
+          <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30">CANADIAN FED + AB PROV</span>
+        </div>
+        <p class="text-[11px] text-slate-400 hidden md:block">Operational Encounter Flowcharts, Statutory Authorities &amp; Charter Jurisprudence</p>
+      </div>
+    </div>
+
+    <!-- GLOBAL SEARCH & QUICK TOOLS -->
+    <div class="flex items-center gap-2">
+      <div class="relative hidden lg:block w-72">
+        <input id="globalSearch" type="text" placeholder="Search case law, section, node (e.g. Feeney, 495, MAS)..."
+          class="w-full bg-tac-bg border border-tac-border rounded px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-400 font-mono" />
+        <div id="searchResults" class="hidden absolute left-0 right-0 mt-1 bg-tac-card border border-tac-border rounded-md shadow-2xl max-h-80 overflow-y-auto z-50 divide-y divide-tac-border"></div>
+      </div>
+
+      <button onclick="openModal('charterModal')" class="px-2.5 py-1.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+        <span>⚖</span> <span class="hidden sm:inline">CHARTER READOUTS</span>
+      </button>
+      <button onclick="openModal('groundsModal')" class="px-2.5 py-1.5 rounded bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+        <span>📶</span> <span class="hidden sm:inline">GROUNDS LADDER</span>
+      </button>
+      <button onclick="openModal('caseIndexModal')" class="px-2.5 py-1.5 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+        <span>📚</span> <span class="hidden sm:inline">CASE INDEX</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN 3-COLUMN WORKSPACE -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- LEFT SIDEBAR: SCENARIO MODULES -->
+    <aside class="w-72 bg-tac-panel border-r border-tac-border flex flex-col shrink-0 overflow-hidden">
+      <div class="p-3 border-b border-tac-border flex items-center justify-between">
+        <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Encounter Modules</span>
+        <span id="scenarioCount" class="text-[10px] font-mono bg-tac-card px-1.5 py-0.5 rounded text-slate-400 border border-tac-border">6 TREES</span>
+      </div>
+      <div id="moduleList" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
+      <div class="p-3 border-t border-tac-border bg-tac-bg/60 text-[10px] text-slate-500 leading-relaxed">
+        <strong class="text-slate-400">TRAINING &amp; REFERENCE AID:</strong> Verify current statutory amendments &amp; agency policy prior to operational deployment.
+      </div>
+    </aside>
+
+    <!-- CENTER CANVAS: ACTIVE DECISION ENGINE -->
+    <main class="flex-1 flex flex-col overflow-hidden grid-bg relative">
+      <!-- BREADCRUMB & ARTICULATION BAR -->
+      <div class="bg-tac-panel/90 backdrop-blur border-b border-tac-border px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
+        <div id="breadcrumbTrail" class="flex items-center gap-1.5 overflow-x-auto text-xs font-mono whitespace-nowrap py-0.5"></div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button onclick="stepBack()" id="btnBack" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 disabled:opacity-40 transition">
+            ← BACK
+          </button>
+          <button onclick="resetScenario()" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 transition">
+            ↺ RESTART
+          </button>
+          <button onclick="openExportModal()" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-semibold transition">
+            📋 EXPORT NOTES
+          </button>
+        </div>
+      </div>
+
+      <!-- DECISION NODE VIEWPORT -->
+      <div id="nodeViewport" class="flex-1 overflow-y-auto p-5 md:p-8 max-w-4xl w-full mx-auto space-y-6">
+        <!-- Populated dynamically -->
+      </div>
+    </main>
+
+    <!-- RIGHT INSPECTOR: STATUTES, CASE LAW & CHARTER TRAPS -->
+    <aside class="w-96 xl:w-[430px] bg-tac-panel border-l border-tac-border flex flex-col shrink-0 overflow-hidden">
+      <div class="flex border-b border-tac-border bg-tac-bg/50 shrink-0">
+        <button onclick="switchInspectorTab('statutes')" id="tab-statutes" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition">
+          STATUTES
+        </button>
+        <button onclick="switchInspectorTab('caselaw')" id="tab-caselaw" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          CASE LAW
+        </button>
+        <button onclick="switchInspectorTab('articulation')" id="tab-articulation" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+          NOTES &amp; TRAPS
+        </button>
+      </div>
+      <div id="inspectorContent" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Populated dynamically -->
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- MODAL: CHARTER READOUTS -->
+  <div id="charterModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-tac-panel border border-tac-border rounded-lg max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-tac-border flex items-center justify-between">
+        <h2 class="font-mono font-bold text-sm text-amber-400 uppercase">⚖ Mandatory Charter Cautions &amp; Demand Readouts</h2>
+        <button onclick="closeModal('charterModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-4 text-xs leading-relaxed">
+        <div class="bg-tac-card border border-tac-border rounded p-3.5">
+          <div class="font-mono font-bold text-sky-400 mb-1">1. INVESTIGATIVE DETENTION (Charter s. 10(a) &amp; 10(b) — R. v. Mann / R. v. Suberu)</div>
+          <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
+            "You are being detained for an investigation into [state specific offence/reason]. You have the right to retain and instruct counsel without delay. You may call any lawyer you want. There is a 24-hour telephone service available which provides legal advice without charge and can explain the Legal Aid plan to you. Do you understand? Do you wish to call a lawyer now?"
+          </p>
+        </div>
+        <div class="bg-tac-card border border-tac-border rounded p-3.5">
+          <div class="font-mono font-bold text-crimson mb-1">2. ARREST CAUTION &amp; RIGHT TO COUNSEL (Charter s. 10(a) &amp; 10(b))</div>
+          <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
+            "You are under arrest for [state offence]. It is my duty to inform you that you have the right to retain and instruct counsel without delay. You may call any lawyer you want. A free 24-hour Legal Aid duty counsel service is available to provide immediate legal advice. Do you understand? Do you want to call a lawyer?"
+          </p>
+        </div>
+        <div class="bg-tac-card border border-tac-border rounded p-3.5">
+          <div class="font-mono font-bold text-amber-400 mb-1">3. PRIMARY POLICE CAUTION (Right to Silence — R. v. Hebert)</div>
+          <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
+            "You are charged with / will be charged with [offence]. Do you wish to say anything in answer to the charge? You are not obliged to say anything unless you wish to do so, but whatever you say may be given in evidence."
+          </p>
+        </div>
+        <div class="bg-tac-card border border-tac-border rounded p-3.5">
+          <div class="font-mono font-bold text-purple-400 mb-1">4. SECONDARY CAUTION (Prior Statement / Inducement Erasure)</div>
+          <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
+            "If you have spoken to any police officer or to anyone with authority or if any such person has spoken to you in connection with this matter, I want it clearly understood that I do not want it to influence you in making any statement."
+          </p>
+        </div>
+        <div class="bg-tac-card border border-tac-border rounded p-3.5">
+          <div class="font-mono font-bold text-emerald-400 mb-1">5. MANDATORY ALCOHOL SCREENING (MAS) DEMAND — CCC s. 320.27(2)</div>
+          <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
+            "I demand that you provide forthwith a sample of your breath into an approved screening device to enable a proper analysis to be made to determine the presence, if any, of alcohol in your blood, and to accompany me for that purpose."
+          </p>
+          <p class="text-[11px] text-slate-400 mt-1.5">Note: Right to counsel (s. 10(b)) is constitutionally suspended for valid forthwith roadside ASD demands (<em>R. v. Orbanski; R. v. Elias</em>; <em>R. v. Thomsen</em>).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GROUNDS LADDER -->
+  <div id="groundsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-tac-panel border border-tac-border rounded-lg max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-tac-border flex items-center justify-between">
+        <h2 class="font-mono font-bold text-sm text-purple-400 uppercase">📶 Canadian Legal Thresholds &amp; Grounds Ladder</h2>
+        <button onclick="closeModal('groundsModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-3 text-xs">
+        <div class="p-3 rounded bg-slate-800/60 border border-slate-700">
+          <div class="font-mono font-bold text-slate-300">TIER 1: MERE HUNCH / CONSENSUAL INTERACTION (Zero Detention)</div>
+          <p class="text-slate-400 mt-1">Police may approach and ask questions in public spaces without grounds, provided a reasonable person would feel free to walk away (<em>R. v. Suberu</em>). Zero power to compel ID (outside licensed driving/regulatory duties) or search.</p>
+        </div>
+        <div class="p-3 rounded bg-sky-950/50 border border-sky-700/50">
+          <div class="font-mono font-bold text-sky-400">TIER 2: STATUTORY TRAFFIC STOP / MAS (TSA s. 166 / CCC s. 320.27(2))</div>
+          <p class="text-slate-300 mt-1">Random traffic stop authorized for highway safety regulation (<em>R. v. Ladouceur</em>). Permits demand for DL, registration, insurance, mechanical check, and forthwith ASD breath sample if device is immediately on hand. Cannot morph into a criminal fishing expedition without new grounds (<em>R. v. Mellenthin</em>).</p>
+        </div>
+        <div class="p-3 rounded bg-amber-950/40 border border-amber-600/50">
+          <div class="font-mono font-bold text-amber-400">TIER 3: REASONABLE SUSPICION (Articulable Cause — R. v. Mann / R. v. Chehil)</div>
+          <p class="text-slate-300 mt-1">Constellation of objectively discernible facts showing a <strong>reasonable possibility</strong> (not probability) that the individual is implicated in a specific criminal offence. Authorizes brief investigative detention, s. 10(a)/(b) rights, and protective safety pat-down ONLY if reasonable safety concern exists.</p>
+        </div>
+        <div class="p-3 rounded bg-red-950/40 border border-red-600/50">
+          <div class="font-mono font-bold text-red-400">TIER 4: REASONABLE &amp; PROBABLE GROUNDS (RPG — R. v. Storrey)</div>
+          <p class="text-slate-300 mt-1">Subjective belief honestly held by the officer AND objectively justifiable by a reasonable person standing in the officer's shoes (<strong>credibly-based probability</strong>). Required for warrantless arrest (CCC s. 495), breathalyzer demand (s. 320.28), and search warrants (s. 487).</p>
+        </div>
+        <div class="p-3 rounded bg-purple-950/40 border border-purple-600/50">
+          <div class="font-mono font-bold text-purple-400">TIER 5: EXIGENT CIRCUMSTANCES + RPG (CCC s. 529.3 / s. 117.02 / s. 487.11)</div>
+          <p class="text-slate-300 mt-1">RPG to arrest/search PLUS urgency making obtaining a warrant impracticable due to imminent bodily harm/death or imminent loss/destruction of evidence. Convenience or administrative delay is NEVER exigency.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CASE LAW INDEX -->
+  <div id="caseIndexModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-tac-panel border border-tac-border rounded-lg max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-tac-border flex items-center justify-between gap-4">
+        <h2 class="font-mono font-bold text-sm text-sky-400 uppercase shrink-0">📚 Supreme Court &amp; Appellate Precedent Library</h2>
+        <input id="caseFilterInput" type="text" placeholder="Filter cases..." class="bg-tac-bg border border-tac-border rounded px-3 py-1 text-xs font-mono text-slate-200 w-64 focus:outline-none focus:border-sky-400">
+        <button onclick="closeModal('caseIndexModal')" class="text-slate-400 hover:text-white font-mono text-sm shrink-0">✕ ESC</button>
+      </div>
+      <div id="caseIndexList" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPORT ARTICULATION LOG -->
+  <div id="exportModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-tac-panel border border-tac-border rounded-lg max-w-2xl w-full flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-tac-border flex items-center justify-between">
+        <h2 class="font-mono font-bold text-sm text-emerald-400 uppercase">📋 Decision Path &amp; Statutory Articulation Log</h2>
+        <button onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <p class="text-xs text-slate-400">Generated summary of your decision path, legal thresholds, and governing authorities for study notes or report structuring:</p>
+        <textarea id="exportTextarea" rows="14" readonly class="w-full bg-tac-bg border border-tac-border rounded p-3 font-mono text-xs text-slate-200 focus:outline-none"></textarea>
+        <div class="flex justify-end gap-2">
+          <button onclick="copyExportText()" id="copyBtn" class="px-4 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-xs transition">
+            COPY TO CLIPBOARD
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. MASTER JURISPRUDENCE LIBRARY
+    // =========================================================================
+    const CASE_LIBRARY = {
+      ladouceur: {
+        title: "R. v. Ladouceur, [1990] 1 S.C.R. 1257",
+        topic: "Random Traffic Stops",
+        holding: "Random routine vehicle stops under provincial highway traffic legislation violate Charter s. 9 (arbitrary detention) but are saved under s. 1 as a proportionate measure to ensure highway safety, licensing, insurance, and sobriety."
+      },
+      mellenthin: {
+        title: "R. v. Mellenthin, [1992] 3 S.C.R. 615",
+        topic: "Checkstop Scope Limits",
+        holding: "Checkstop and random traffic stop powers do NOT authorize unfounded searches of the vehicle or questioning unrelated to highway safety. Shining a flashlight inside is permissible for safety, but compelling a bag search without grounds violates s. 8."
+      },
+      mann: {
+        title: "R. v. Mann, 2004 SCC 52",
+        topic: "Investigative Detention & Pat-Downs",
+        holding: "Police may briefly detain an individual for investigative purposes if there are reasonable grounds to suspect (articulable cause) a nexus to a recent or ongoing criminal offence. Incidental protective pat-down search is lawful ONLY where officer reasonably believes safety is at risk—not to search for evidence."
+      },
+      suberu: {
+        title: "R. v. Suberu, 2009 SCC 33",
+        topic: "Psychological Detention & s. 10(b)",
+        holding: "Preliminary police questioning does not automatically trigger detention. Detention occurs when a reasonable person concludes they have no choice but to comply. Once detained, s. 10(b) right to counsel applies 'immediately'—prior to questioning."
+      },
+      grant: {
+        title: "R. v. Grant, 2009 SCC 32",
+        topic: "Detention Test & s. 24(2) Exclusion",
+        holding: "Establishes the 3-part test for psychological detention (circumstances of encounter, nature of police conduct, individual characteristics) and the 3-prong s. 24(2) framework for excluding unconstitutionally obtained evidence."
+      },
+      chehil: {
+        title: "R. v. Chehil, 2013 SCC 49",
+        topic: "Reasonable Suspicion Standard",
+        holding: "Reasonable suspicion must be grounded in objectively discernible facts assessed against the totality of the circumstances. Exculpatory or innocent explanations do not erase reasonable suspicion, though generalized 'hunches' fail."
+      },
+      mackenzie: {
+        title: "R. v. MacKenzie, 2013 SCC 50",
+        topic: "Officer Experience & Reasonable Suspicion",
+        holding: "Police training and field experience can inform the assessment of objective facts on a traffic stop (e.g., indicators of drug trafficking), provided the suspicion remains objectively verifiable."
+      },
+      feeney: {
+        title: "R. v. Feeney, [1997] 2 S.C.R. 13",
+        topic: "Warrantless Entry into Dwelling to Arrest",
+        holding: "Police generally CANNOT enter a private dwelling house without a warrant (CCC s. 529) to effect an arrest unless exigent circumstances exist or proper informed consent is obtained."
+      },
+      godoy: {
+        title: "R. v. Godoy, [1999] 1 S.C.R. 311",
+        topic: "911 Hang-Up / Emergency Duty Entry",
+        holding: "Police have a common law duty to protect life and safety. Responding to a disconnected 911 call authorizes forced entry into a dwelling if necessary to verify occupant welfare, though intrusion must stop once safety is confirmed."
+      },
+      clayton: {
+        title: "R. v. Clayton, 2007 SCC 32",
+        topic: "Targeted Roadblocks / Perimeter Containment",
+        holding: "Ancillary powers doctrine authorizes targeted vehicle stops and perimeter containment near an active crime scene (e.g., firearm call) where reasonably necessary and proportionate to the seriousness and immediacy of the threat."
+      },
+      evans: {
+        title: "R. v. Evans, [1996] 1 S.C.R. 8",
+        topic: "Implied License to Knock",
+        holding: "Occupants extend an implied license to the public (including police) to approach the front door to communicate. If police approach with the predominant purpose of gathering evidence (e.g., sniffing for drugs), they exceed the implied license and conduct a s. 8 search."
+      },
+      le: {
+        title: "R. v. Le, 2019 SCC 34",
+        topic: "Backyard Entry & Psychological Detention",
+        holding: "Implied license does NOT extend to fenced backyards. Warrantless entry into a private backyard is trespass and triggers immediate psychological detention when police question occupants inside."
+      },
+      caslake: {
+        title: "R. v. Caslake, [1998] 1 S.C.R. 51",
+        topic: "Search of Vehicle Incident to Arrest",
+        holding: "Search of a vehicle incident to arrest is lawful if truly incidental to the arrest—for officer safety, preserving evidence, or discovering evidence of the offence for which the person was arrested. Inventory searches for towing require statutory/policy basis and cannot be disguised investigative searches."
+      },
+      fearon: {
+        title: "R. v. Fearon, 2014 SCC 77",
+        topic: "Cell Phone Search Incident to Arrest",
+        holding: "Police may conduct a strictly limited search of a cell phone incident to arrest ONLY if: (1) arrest is lawful, (2) search is truly incidental to arrest, (3) nature/extent are tailored to purpose (recent texts/calls/photos), and (4) detailed notes are kept of what was searched and why."
+      },
+      golden: {
+        title: "R. v. Golden, 2001 SCC 83",
+        topic: "Strip Searches Incident to Arrest",
+        holding: "Strip searches are inherently humiliating and CANNOT be routine policy. Require reasonable and probable grounds to believe a strip search is necessary to discover weapons or evidence related to the arrest, conducted privately at the station absent exigent field urgency."
+      },
+      orbanski: {
+        title: "R. v. Orbanski; R. v. Elias, 2005 SCC 37",
+        topic: "Roadside Sobriety Screening & s. 10(b)",
+        holding: "Roadside sobriety screening demands (ASD / SFST) temporarily limit s. 10(b) right to counsel under s. 1; however, statements or admissions made during roadside screening cannot be used to incriminate the driver at trial beyond establishing grounds."
+      },
+      stairs: {
+        title: "R. v. Stairs, 2022 SCC 11",
+        topic: "Home Search Incident to Arrest",
+        holding: "Where an arrest occurs inside a home, search incident to arrest of areas outside the arrestee's immediate physical control requires reasonable suspicion of a safety risk to police or occupants."
+      },
+      tim: {
+        title: "R. v. Tim, 2022 SCC 12",
+        topic: "Mistake of Law & Arrest Validity",
+        holding: "An arrest based on a mistake of law (believing a non-existent offence exists) is unlawful under s. 9, though evidence may still be evaluated under s. 24(2) depending on good faith and seriousness of state conduct."
+      }
+    };
+
+    // =========================================================================
+    // 2. COMPLETE ENCOUNTER DECISION TREES
+    // =========================================================================
+    const SCENARIOS = [
+      {
+        id: "traffic_stop",
+        code: "MOD-01",
+        title: "Traffic & Vehicle Stops",
+        subtitle: "Random / Speeding / MAS / Passenger & Vehicle Search",
+        badge: "TSA s.166 / CCC s.320.27",
+        startNode: "ts_start",
+        nodes: {
+          ts_start: {
+            title: "Initiating the Vehicle Stop",
+            threshold: "STATUTORY AUTHORITY (TSA s. 166)",
+            thresholdColor: "sky",
+            prompt: "You initiate a traffic stop (either a random check for licensing/insurance/sobriety OR an observed moving/equipment violation such as speeding). Vehicle pulls over safely.",
+            operationalGuidance: [
+              "Activate emergency lights; position cruiser for tactical offset and lane protection.",
+              "Run plate via CPIC/PROS prior to approach to check registered owner status, stolen flags, and caution alerts.",
+              "Establish clear highway safety nexus upon approach."
+            ],
+            choices: [
+              { label: "Standard Driver Contact & Document Demand (DL, Reg, Insurance)", next: "ts_docs" },
+              { label: "Administer Mandatory Alcohol Screening (MAS — ASD on hand)", next: "ts_mas" },
+              { label: "Passenger Identification / Behaviour Questioning", next: "ts_passenger" },
+              { label: "Driver Fails to Stop / Flees Scene", next: "ts_flight" }
+            ],
+            statutes: [
+              { code: "Alberta Traffic Safety Act (TSA) s. 166(1)-(2)", text: "A peace officer may signal or request a driver to stop; driver must immediately bring vehicle to a safe stop and remain stopped until permitted to leave." },
+              { code: "TSA s. 167(1)", text: "Driver must produce driver's licence, certificate of registration, and financial responsibility (insurance) card upon request." }
+            ],
+            cases: ["ladouceur", "mellenthin"],
+            articulation: [
+              "Record exact location, time, reason for stop (random highway safety check vs. specific TSA speed/equipment violation).",
+              "Do NOT ask open-ended criminal fishing questions ('Where are you coming from? Anything illegal in the car?') unless articulable suspicion arises."
+            ],
+            traps: [
+              "R. v. Mellenthin Trap: Using a routine traffic stop as a pretext to interrogate occupants about drugs or search bags without independent grounds violates Charter ss. 8 & 9."
+            ]
+          },
+          ts_docs: {
+            title: "Document Verification & Roadside Observations",
+            threshold: "STATUTORY REGULATORY DUTY",
+            thresholdColor: "sky",
+            prompt: "Driver produces documents (or fails to produce). During interaction, evaluate sobriety, licence status, and any plain-view indicators.",
+            operationalGuidance: [
+              "Verify driver identity and licence class/conditions (e.g., GDL zero-alcohol, ignition interlock, suspended).",
+              "Observe plain-view interior strictly from outside vehicle using flashlight if needed."
+            ],
+            choices: [
+              { label: "Documents Valid & No Impairment/Offence → Issue Ticket/Warning & Release", next: "ts_release" },
+              { label: "Indicators of Alcohol/Drug Impairment Observed → Sobriety Demand", next: "ts_mas" },
+              { label: "Driver is Suspended / Prohibited / Unlicensed → Enforcement Action", next: "ts_suspended" },
+              { label: "Articulable Facts of Criminal Offence (Drugs/Weapons) → Detain", next: "ts_detain_crim" }
+            ],
+            statutes: [
+              { code: "TSA s. 167(2)-(3)", text: "Refusal or failure to produce required documents is a provincial offence; allows brief detention solely to verify identity." },
+              { code: "Alberta Gaming, Liquor and Cannabis Act (GLCA) s. 89 / s. 90.28", text: "Prohibits open liquor or cannabis within easy reach of occupants in a vehicle; grants targeted search authority upon reasonable grounds." }
+            ],
+            cases: ["ladouceur", "mellenthin", "mackenzie"],
+            articulation: [
+              "Document specific sensory observations (odour of alcohol/burnt cannabis, bloodshot eyes, slurred speech, open containers in plain view).",
+              "Distinguish raw cannabis odour (legal to possess up to 30g in public) from accessible open cannabis in vehicle (GLCA violation)."
+            ],
+            traps: [
+              "Smell of unburnt cannabis alone does NOT automatically establish Criminal Code impaired driving or CDSA possession without additional grounds."
+            ]
+          },
+          ts_mas: {
+            title: "Mandatory Alcohol Screening (MAS) & Sobriety Testing",
+            threshold: "LAWFUL STOP + DEVICE ON HAND (CCC s. 320.27(2))",
+            thresholdColor: "amber",
+            prompt: "If you have an Approved Screening Device (ASD) in your immediate possession during a lawful traffic stop, you may demand a breath sample WITHOUT reasonable suspicion of alcohol consumption. For SFST/drug screening, reasonable suspicion is required.",
+            operationalGuidance: [
+              "Confirm ASD calibration date and ensure device is immediately available ('forthwith').",
+              "Read formal MAS Demand (CCC s. 320.27(2)) or Reasonable Suspicion ASD/SFST Demand (s. 320.27(1)).",
+              "Right to counsel (s. 10(b)) does NOT apply prior to forthwith roadside ASD compliance."
+            ],
+            choices: [
+              { label: "ASD Result: PASS (Under 50 mg%) → Conclude Traffic Stop", next: "ts_release" },
+              { label: "ASD Result: WARN / Alberta IRS Sanctions → Provincial Suspension & Tow", next: "ts_irs" },
+              { label: "ASD Result: FAIL (Over 80) → Arrest & Evidentiary Breath Demand", next: "ts_impaired_arrest" },
+              { label: "Driver Refuses / Fails to Provide Sample → Arrest for Refusal", next: "ts_refusal_arrest" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 320.27(2) (MAS)", text: "If a peace officer has an approved screening device in their possession, they may demand a driver lawfully stopped provide a breath sample forthwith—no suspicion required." },
+              { code: "Criminal Code s. 320.27(1)", text: "Where officer has reasonable suspicion of alcohol or drug in body, may demand SFST or ASD sample forthwith." },
+              { code: "Criminal Code s. 320.15(1)", text: "Failure or refusal to comply with a lawful demand is a criminal offence carrying identical penalties to impaired driving." }
+            ],
+            cases: ["orbanski", "ladouceur"],
+            articulation: [
+              "Note exact time of stop, time ASD demand read, serial number/calibration date of ASD, and time sample provided.",
+              "If MAS is used, explicitly note the ASD was physically in your possession/cruiser at the moment of the demand."
+            ],
+            traps: [
+              "Delaying a MAS demand for 15 minutes to wait for another unit to bring an ASD invalidates the 'forthwith' requirement unless s. 10(b) counsel rights are provided."
+            ]
+          },
+          ts_passenger: {
+            title: "Passenger Rights & Identification Authority",
+            threshold: "NO GENERAL AUTHORITY TO COMPEL ID",
+            thresholdColor: "amber",
+            prompt: "Passengers in a stopped vehicle are NOT required to identify themselves or answer police questions unless a specific statutory violation or reasonable suspicion attaches to the passenger personally.",
+            operationalGuidance: [
+              "You may ask a passenger for ID conversationally, but cannot demand it or detain them solely because the driver committed a traffic infraction.",
+              "Exceptions: Passenger not wearing seatbelt (TSA), open liquor/cannabis within passenger's reach (GLCA), or passenger is subject to investigative detention (Mann)."
+            ],
+            choices: [
+              { label: "Passenger Commits Separate Offence (e.g. No Seatbelt / Open Liquor)", next: "ts_docs" },
+              { label: "Articulable Reasonable Suspicion Attaches to Passenger → Mann Detention", next: "ts_detain_crim" },
+              { label: "No Offence / Grounds on Passenger → Passenger Free to Leave", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Alberta TSA / Occupant Restraint Regs", text: "Passenger aged 16+ is personally liable for failing to wear a seatbelt; creates statutory basis to identify passenger to issue violation ticket." },
+              { code: "Charter s. 9 & s. 10(b)", text: "Compelling a passenger to remain or produce ID without statutory or Mann authority constitutes arbitrary detention." }
+            ],
+            cases: ["suberu", "grant", "mellenthin"],
+            articulation: [
+              "Clearly separate driver-focused observations from passenger-specific observations in your notes."
+            ],
+            traps: [
+              "Running a CPIC check on a passenger's ID obtained via an unlawful demand will taint any resulting warrant arrest under Charter s. 24(2)."
+            ]
+          },
+          ts_detain_crim: {
+            title: "Escalation to Criminal Investigative Detention",
+            threshold: "REASONABLE SUSPICION (R. v. Mann)",
+            thresholdColor: "amber",
+            prompt: "Objective facts observed during the stop create a reasonable suspicion of a criminal offence (e.g., drug trafficking, prohibited weapon, stolen property). The stop has now transitioned from a regulatory traffic stop to a criminal detention.",
+            operationalGuidance: [
+              "Immediately advise the subject of the new reason for detention (s. 10(a)) and provide Charter s. 10(b) right to counsel without delay.",
+              "Conduct a safety pat-down ONLY if you have articulable safety concerns (weapons).",
+              "Do NOT search the vehicle interior/trunk on reasonable suspicion alone—vehicle search requires RPG + statutory/arrest authority or a warrant."
+            ],
+            choices: [
+              { label: "Grounds Elevate to Reasonable & Probable Grounds (RPG) → Arrest", next: "ts_vehicle_search" },
+              { label: "Suspicion Dispelled / Insufficient for RPG → Release", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Charter s. 10(a) & s. 10(b)", text: "Must inform detainee promptly of the criminal reason for detention and facilitate right to counsel before eliciting statements." },
+              { code: "CDSA s. 11(7) (Exigent Search)", text: "Warrantless search of vehicle/place for controlled substances requires Reasonable & Probable Grounds (NOT mere suspicion) PLUS exigent circumstances." }
+            ],
+            cases: ["mann", "chehil", "mackenzie", "suberu"],
+            articulation: [
+              "List every objective indicator forming your constellation of reasonable suspicion (e.g., masking odours, multiple cell phones, score sheets, inconsistent travel story, CPIC flags).",
+              "Record exact time s. 10(a)/(b) was read upon transition from TSA stop to criminal detention."
+            ],
+            traps: [
+              "Continuing to question the driver after forming reasonable suspicion without reading s. 10(b) will result in statement exclusion."
+            ]
+          },
+          ts_vehicle_search: {
+            title: "Arrest & Search of Vehicle Incident to Arrest",
+            threshold: "REASONABLE & PROBABLE GROUNDS (RPG)",
+            thresholdColor: "crimson",
+            prompt: "Subject is lawfully arrested (CCC s. 495). Evaluate legal basis to search the vehicle.",
+            operationalGuidance: [
+              "Read Arrest Caution & Charter s. 10(a)/(b) immediately; facilitate phone call to counsel at first reasonable opportunity.",
+              "Search incident to arrest (Caslake) is strictly limited to: (1) officer safety, (2) preserving evidence, or (3) discovering evidence directly tied to the offence of arrest.",
+              "If arresting for an offence with no physical evidence in the car (e.g., an old unpaid fine warrant), you CANNOT search the vehicle under Caslake."
+            ],
+            choices: [
+              { label: "Complete Search, Seize Exhibits & Process Release / Remand", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 495(1)", text: "Warrantless arrest power based on RPG of indictable offence, found committing any criminal offence, or active arrest warrant." },
+              { code: "Common Law Search Incident to Arrest (R. v. Caslake)", text: "Requires a valid underlying arrest and a subjective + objective nexus between the vehicle search and the arrest purpose." }
+            ],
+            cases: ["caslake", "golden", "fearon"],
+            articulation: [
+              "Explicitly state WHY you searched the vehicle (e.g., 'Searched passenger compartment incident to arrest for CDSA s. 5(2) possession for purpose of trafficking to locate additional controlled substances and packaging')."
+            ],
+            traps: [
+              "Calling a search an 'inventory search prior to tow' when your true purpose is looking for contraband is a s. 8 Charter breach (R. v. Caslake)."
+            ]
+          },
+          ts_impaired_arrest: {
+            title: "Impaired / Over 80 Arrest & Evidentiary Demand",
+            threshold: "RPG + ASD FAIL / IMPAIRMENT SYMPTOMS",
+            thresholdColor: "crimson",
+            prompt: "ASD registers a FAIL (or severe physical impairment symptoms establish RPG). Place driver under arrest for Impaired Operation / Over 80 (CCC s. 320.14).",
+            operationalGuidance: [
+              "Arrest driver, handcuff/search incident to arrest for safety, read Charter s. 10(a)/(b) + Police Caution.",
+              "Read formal Breathalyzer / Blood Demand (CCC s. 320.28) as soon as practicable.",
+              "Transport to detachment; provide private telephone access to counsel BEFORE collecting evidentiary breath samples."
+            ],
+            choices: [
+              { label: "Conclude Processing & Issue Release / Appearance Notice", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 320.14(1)", text: "Operation while impaired or with BAC ≥ 80 mg/100 mL within 2 hours of ceasing to operate." },
+              { code: "Criminal Code s. 320.28(1)", text: "Evidentiary breath demand requires RPG that driver committed s. 320.14 offence within preceding 3 hours; samples taken as soon as practicable." }
+            ],
+            cases: ["orbanski", "caslake"],
+            articulation: [
+              "Record exact timestamps: time of driving/stop, ASD fail, arrest, s. 10(b) readout, s. 320.28 demand, arrival at detachment, counsel call start/end, and each breath sample."
+            ],
+            traps: [
+              "Unexplained gaps in timing ('as soon as practicable') or failure to provide genuine privacy during the lawyer call will fatalize the prosecution."
+            ]
+          },
+          ts_irs: {
+            title: "Alberta Immediate Roadside Sanctions (IRS)",
+            threshold: "ASD WARN / PROVINCIAL SANCTION",
+            thresholdColor: "amber",
+            prompt: "Driver blows a WARN (50–99 mg%) or triggers Alberta TSA s. 88.1 IRS sanctions. No Criminal Code charge laid.",
+            operationalGuidance: [
+              "Advise driver of right to a second test on a different ASD if requested under Alberta IRS rules.",
+              "Serve Notice of Suspension / Seizure, confiscate driver's licence, and arrange statutory vehicle seizure/tow."
+            ],
+            choices: [
+              { label: "Complete Tow & Roadside Release", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Alberta TSA s. 88 / s. 88.1", text: "Immediate Roadside Sanctions (IRS) regime for WARN readings, GDL zero-tolerance violations, and impaired administrative sanctions." }
+            ],
+            cases: ["ladouceur"],
+            articulation: [
+              "Document ASD serial numbers, both test readings if second test requested, and tow company details."
+            ],
+            traps: [
+              "Ensure the driver is advised of their statutory right to request a second screening test on a different device."
+            ]
+          },
+          ts_suspended: {
+            title: "Suspended / Prohibited Driving",
+            threshold: "PROVINCIAL SUSPENSION vs. CRIMINAL PROHIBITION",
+            thresholdColor: "amber",
+            prompt: "CPIC/MOVES check reveals driver is suspended. Distinguish provincial suspension (TSA) from Criminal Code driving prohibition.",
+            operationalGuidance: [
+              "Provincial Suspension (TSA s. 94): Issue Summons/Part 2 ticket, seize vehicle (30-day mandatory impound under TSA s. 173). No criminal arrest unless identity cannot be confirmed.",
+              "Criminal Prohibition (CCC s. 320.18): Arrestable criminal offence under CCC s. 495."
+            ],
+            choices: [
+              { label: "Process Seizure / Arrest & Conclude", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Alberta TSA s. 94 & s. 173", text: "Driving while unauthorized/suspended; mandatory 30-day vehicle seizure." },
+              { code: "Criminal Code s. 320.18", text: "Operation while prohibited under a Criminal Code order." }
+            ],
+            cases: ["ladouceur", "caslake"],
+            articulation: [
+              "Confirm service/knowledge of suspension via registry abstract or prior officer endorsement."
+            ],
+            traps: [
+              "Arresting criminally for a purely provincial TSA suspension is an unlawful arrest under R. v. Tim."
+            ]
+          },
+          ts_refusal_arrest: {
+            title: "Arrest for Failure / Refusal to Comply with Demand",
+            threshold: "UNEQUIVOCAL REFUSAL OR FEIGNED SAMPLE",
+            thresholdColor: "crimson",
+            prompt: "Driver explicitly refuses or repeatedly feigns blowing into the ASD after clear instructions and warning of criminal consequences.",
+            operationalGuidance: [
+              "Give clear final opportunity and warn that refusal is a criminal offence carrying the same penalty as impaired driving.",
+              "Arrest under CCC s. 495 for Refusal (CCC s. 320.15(1)), read s. 10(a)/(b) and Caution."
+            ],
+            choices: [
+              { label: "Complete Arrest & Release Processing", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 320.15(1)", text: "Refusal or failure without reasonable excuse to comply with a lawful demand under s. 320.27 or s. 320.28." }
+            ],
+            cases: ["orbanski"],
+            articulation: [
+              "Quote driver's exact words of refusal verbatim and document number of attempts/mouthpieces used if feigning."
+            ],
+            traps: [
+              "Ensure ASD was functioning properly and mouthpiece was unobstructed before charging feigned sample refusal."
+            ]
+          },
+          ts_flight: {
+            title: "Failure to Stop / Flight from Peace Officer",
+            threshold: "PURSUIT POLICY & PUBLIC SAFETY BALANCING",
+            thresholdColor: "crimson",
+            prompt: "Vehicle accelerates or flees after emergency lights/siren activated.",
+            operationalGuidance: [
+              "Immediately evaluate agency pursuit policy: weigh seriousness of known offence against public/pedestrian risk.",
+              "If pursuit terminated, broadcast description, direction of travel, and plate for containment or follow-up registered owner investigation."
+            ],
+            choices: [
+              { label: "Vehicle Stopped / Contained → Proceed to High-Risk / Arrest", next: "ts_vehicle_search" },
+              { label: "Pursuit Terminated → Follow-Up Investigation", next: "ts_release" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 320.17", text: "Flight from peace officer while operating a motor vehicle." },
+              { code: "Alberta TSA s. 166(2)", text: "Provincial offence of failing to stop for a peace officer." }
+            ],
+            cases: ["clayton"],
+            articulation: [
+              "Articulate traffic density, road conditions, speed, and risk assessment if pursuit initiated or terminated."
+            ],
+            traps: [
+              "Continuing a high-speed pursuit for a minor traffic infraction violates policy and s. 25(1) reasonableness."
+            ]
+          },
+          ts_release: {
+            title: "Encounter Concluded & Disengagement",
+            threshold: "DUTY TERMINATED",
+            thresholdColor: "emerald",
+            prompt: "Traffic stop or investigative processing is complete. Ensure vehicle can safely re-enter traffic and complete detailed contemporaneous notes.",
+            operationalGuidance: [
+              "Return all personal documents and explain any tickets, summonses, or release conditions clearly.",
+              "Complete notebook entry while facts are fresh."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Charter s. 9", text: "Detention must end immediately once the lawful statutory or investigative purpose is completed." }
+            ],
+            cases: ["ladouceur", "suberu"],
+            articulation: [
+              "Log exact time stop terminated and vehicle departed."
+            ],
+            traps: [
+              "Holding a driver at roadside after handing back tickets just to wait for a drug dog without reasonable suspicion violates Charter s. 9."
+            ]
+          }
+        }
+      },
+      {
+        id: "street_detention",
+        code: "MOD-02",
+        title: "Street Checks & Investigative Detention",
+        subtitle: "Consensual Contact → Psychological Detention → Mann Pat-Down",
+        badge: "Charter s.9/10 / R. v. Mann",
+        startNode: "sd_start",
+        nodes: {
+          sd_start: {
+            title: "Initial Street Contact / Observation",
+            threshold: "MERE CONVERSATION (ZERO DETENTION)",
+            thresholdColor: "emerald",
+            prompt: "You observe an individual in a public space and wish to speak with them. At this stage, you have NO grounds to detain or compel identification.",
+            operationalGuidance: [
+              "Approach in a non-coercive manner; do not block their path, surround them, or issue commands.",
+              "Ask open, voluntary questions. The subject is legally free to ignore you and walk away."
+            ],
+            choices: [
+              { label: "Subject Walks Away / Declines to Speak (No Criminal Grounds)", next: "sd_walkaway" },
+              { label: "Subject Voluntarily Engages & Provides Info", next: "sd_voluntary" },
+              { label: "Articulable Facts Establish Reasonable Suspicion of Crime", next: "sd_mann" }
+            ],
+            statutes: [
+              { code: "Charter s. 9", text: "Everyone has the right not to be arbitrarily detained or imprisoned." }
+            ],
+            cases: ["suberu", "grant", "le"],
+            articulation: [
+              "Record exact words used to initiate contact to demonstrate absence of compulsion."
+            ],
+            traps: [
+              "R. v. Grant Trap: Stepping in front of a pedestrian, using an authoritative tone ('Stop right there, come talk to me'), or holding onto their ID creates a psychological detention—which is arbitrary and unlawful without reasonable suspicion."
+            ]
+          },
+          sd_walkaway: {
+            title: "Subject Declines Interaction",
+            threshold: "RIGHT TO WALK AWAY",
+            thresholdColor: "emerald",
+            prompt: "Walking away or refusing to answer police questions during a consensual encounter does NOT by itself create reasonable suspicion.",
+            operationalGuidance: [
+              "Allow the individual to leave without interference.",
+              "Continue passive observation from a public vantage point if warranted."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Charter s. 7 & s. 9", text: "Right to silence and freedom from arbitrary detention." }
+            ],
+            cases: ["suberu", "grant"],
+            articulation: [
+              "Note time interaction ended and direction subject walked."
+            ],
+            traps: [
+              "Chasing or grabbing someone solely because they refused to stop and chat is an unlawful detention/assault."
+            ]
+          },
+          sd_voluntary: {
+            title: "Consensual Information Gathering",
+            threshold: "NON-DETAINED INTERACTION",
+            thresholdColor: "emerald",
+            prompt: "Subject willingly chats. Monitor carefully so the encounter does not cross into psychological detention.",
+            operationalGuidance: [
+              "If asking for ID, make clear it is voluntary unless a statutory authority applies (e.g., licensed activity, provincial liquor/trespass offence).",
+              "If new facts emerge creating reasonable suspicion, immediately pivot to formal investigative detention."
+            ],
+            choices: [
+              { label: "Interaction Concludes Peacefully → Disengage", next: "sd_walkaway" },
+              { label: "New Objective Facts Create Reasonable Suspicion → Detain", next: "sd_mann" }
+            ],
+            statutes: [
+              { code: "Alberta Trespass to Premises Act / GLCA", text: "Specific provincial statutes grant limited authority to demand name/address where officer has reasonable grounds to believe a provincial trespass or liquor/cannabis offence occurred." }
+            ],
+            cases: ["suberu", "grant"],
+            articulation: [
+              "Document voluntary nature of conversation and any spontaneously offered statements."
+            ],
+            traps: [
+              "Taking a person's ID card and holding it while running CPIC checks converts a consensual chat into a detention."
+            ]
+          },
+          sd_mann: {
+            title: "Investigative Detention & s. 10(a)/(b) Triggers",
+            threshold: "REASONABLE SUSPICION (R. v. Mann)",
+            thresholdColor: "amber",
+            prompt: "You possess a constellation of objectively discernible facts linking the individual to a recent or ongoing criminal offence. You detain them briefly to confirm or dispel suspicion.",
+            operationalGuidance: [
+              "Immediately tell the detainee WHY they are being detained (Charter s. 10(a)).",
+              "Immediately read Charter s. 10(b) right to counsel (R. v. Suberu) before questioning.",
+              "Assess whether a protective safety pat-down is justified."
+            ],
+            choices: [
+              { label: "Articulable Safety Concern Exists → Protective Pat-Down", next: "sd_patdown" },
+              { label: "No Safety Concern → Question/Investigate Post-10(b) Only", next: "sd_outcome" }
+            ],
+            statutes: [
+              { code: "Charter s. 10(a) & s. 10(b)", text: "Prompt reasons for detention + immediate right to retain and instruct counsel without delay." }
+            ],
+            cases: ["mann", "suberu", "chehil"],
+            articulation: [
+              "Detail the exact 'constellation of objectively discernible facts' (time, proximity to crime scene, matching clothing/physical description, flight from actual crime scene, bulges/behaviours)."
+            ],
+            traps: [
+              "Waiting 5–10 minutes to read s. 10(b) while asking 'investigative questions' breaches Suberu unless a narrow, urgent officer-safety question is required."
+            ]
+          },
+          sd_patdown: {
+            title: "Protective Safety Pat-Down Search Limits",
+            threshold: "REASONABLE SAFETY CONCERN (R. v. Mann)",
+            thresholdColor: "amber",
+            prompt: "During a lawful investigative detention, you may conduct a brief outer-clothing pat-down ONLY if you reasonably believe your safety or public safety is at risk.",
+            operationalGuidance: [
+              "Pat outer garments with open hands to feel for weapons (knives, firearms, blunt instruments).",
+              "Do NOT reach into pockets or open containers unless you feel an object that could reasonably be a weapon.",
+              "You CANNOT conduct a pat-down to look for drugs or evidence."
+            ],
+            choices: [
+              { label: "Weapon / Contraband Discovered Establishing RPG → Arrest", next: "sd_arrest" },
+              { label: "No Weapon Found → Continue/Conclude Investigation", next: "sd_outcome" }
+            ],
+            statutes: [
+              { code: "Charter s. 8", text: "Protection against unreasonable search and seizure; Mann pat-down is strictly protective, not evidentiary." }
+            ],
+            cases: ["mann"],
+            articulation: [
+              "Articulate WHY you feared a weapon (e.g., nature of call—armed robbery/shots fired, visible waistband bulge, aggressive/furtive reaching toward pockets)."
+            ],
+            traps: [
+              "Reaching into a pocket after feeling a soft plastic baggie that obviously cannot be a weapon violates s. 8 (R. v. Mann)."
+            ]
+          },
+          sd_outcome: {
+            title: "Detention Resolution: Arrest vs. Release",
+            threshold: "BRIEF DURATION REQUIREMENT",
+            thresholdColor: "sky",
+            prompt: "Investigative detention must be brief. Either your suspicion crystallizes into Reasonable & Probable Grounds (RPG) to arrest, or the detainee must be released immediately.",
+            operationalGuidance: [
+              "Conduct CPIC/victim/witness verification expeditiously.",
+              "If RPG is not established within a brief window, release immediately."
+            ],
+            choices: [
+              { label: "RPG Established → Transition to Arrest", next: "sd_arrest" },
+              { label: "Suspicion Not Confirmed → Unconditional Release", next: "sd_walkaway" }
+            ],
+            statutes: [
+              { code: "Charter s. 9", text: "Prolonged investigative detention without RPG becomes arbitrary imprisonment." }
+            ],
+            cases: ["mann", "chehil"],
+            articulation: [
+              "Record total duration of detention in minutes and investigative steps taken during that window."
+            ],
+            traps: [
+              "Detaining someone in the back of a cruiser for 45 minutes while 'figuring things out' without RPG is unconstitutional."
+            ]
+          },
+          sd_arrest: {
+            title: "Arrest & Search Incident to Arrest",
+            threshold: "REASONABLE & PROBABLE GROUNDS (CCC s. 495)",
+            thresholdColor: "crimson",
+            prompt: "Grounds have elevated to RPG. Place subject under arrest, re-advise of new jeopardy (arrest vs. detention) under s. 10(a)/(b), and conduct full search incident to arrest.",
+            operationalGuidance: [
+              "State clearly: 'You are under arrest for [offence].'",
+              "Re-read Charter s. 10(b) and Primary Police Caution (jeopardy has changed from detention to arrest).",
+              "Conduct full search incident to arrest (pockets, bags carried) for safety, escape tools, and evidence."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 495(1)", text: "Power of peace officer to arrest without warrant." },
+              { code: "Common Law (Cloutier v. Langlois)", text: "Full search of person and immediate surroundings incident to lawful arrest." }
+            ],
+            cases: ["mann", "golden", "fearon"],
+            articulation: [
+              "Document exact transition point from reasonable suspicion to RPG and re-reading of Charter rights."
+            ],
+            traps: [
+              "Failing to re-read s. 10(b) when an investigative detention escalates into a formal arrest."
+            ]
+          }
+        }
+      },
+      {
+        id: "emergency_911",
+        code: "MOD-03",
+        title: "911 Calls, Dynamic Threats & Exigent Entry",
+        subtitle: "911 Hang-Ups / Godoy Welfare Duty / Clayton Roadblocks / Feeney vs. Exigency",
+        badge: "Godoy / CCC s.529.3",
+        startNode: "em_start",
+        nodes: {
+          em_start: {
+            title: "Dispatch to 911 Call / Active Emergency",
+            threshold: "COMMON LAW DUTY TO PROTECT LIFE",
+            thresholdColor: "amber",
+            prompt: "Dispatched to an emergency: disconnected 911 call, domestic disturbance, weapons call, or active crime in progress.",
+            operationalGuidance: [
+              "Gather dispatch CAD details: callback results, prior history at address, weapons flags, number of callers.",
+              "Select tactical response path based on call nature."
+            ],
+            choices: [
+              { label: "911 Hang-Up / Unknown Trouble at Residence (Welfare Check)", next: "em_godoy" },
+              { label: "Active Weapons / Violent Crime Perimeter Containment", next: "em_clayton" },
+              { label: "Known Suspect Inside Residence (Arrest Required)", next: "em_feeney_check" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 25(1)", text: "Protection of persons acting under authority if acting on reasonable grounds and using only necessary force." }
+            ],
+            cases: ["godoy", "clayton", "feeney"],
+            articulation: [
+              "Log exact CAD dispatch time, caller info, and known risk factors prior to arrival."
+            ],
+            traps: [
+              "Treating a routine noise complaint as a 911 life-safety emergency to bypass warrant rules."
+            ]
+          },
+          em_godoy: {
+            title: "911 Hang-Up & Welfare Entry (R. v. Godoy)",
+            threshold: "COMMON LAW EMERGENCY DUTY",
+            thresholdColor: "amber",
+            prompt: "At a residence following a 911 hang-up or distress call. Knock and announce police presence. If unanswered, or if someone answers at the door claiming 'everything is fine' while distress indicators exist:",
+            operationalGuidance: [
+              "Under R. v. Godoy, police have a common law duty to enter a dwelling to verify the safety and welfare of occupants.",
+              "Once inside, check ONLY areas where a person in distress could be located.",
+              "Do NOT open drawers, cupboards, or conduct a criminal search—plain-view observations only."
+            ],
+            choices: [
+              { label: "All Occupants Confirmed Safe & No Offence → Exit Immediately", next: "em_exit" },
+              { label: "Victim Found / Criminal Offence Discovered in Plain View → Arrest/Secure", next: "em_seize_arrest" }
+            ],
+            statutes: [
+              { code: "Common Law Ancillary Power (R. v. Godoy)", text: "Forced entry into a private residence is justified to locate and assist a 911 caller and ensure life/safety." }
+            ],
+            cases: ["godoy", "feeney"],
+            articulation: [
+              "Record exact 911 call details, callback attempts, sounds heard at door, and rooms checked solely for human welfare."
+            ],
+            traps: [
+              "Continuing to search the residence after confirming all occupants are unharmed violates Charter s. 8."
+            ]
+          },
+          em_clayton: {
+            title: "Dynamic Perimeter & Targeted Roadblocks (R. v. Clayton)",
+            threshold: "ANCILLARY POWER / IMMINENT THREAT",
+            thresholdColor: "crimson",
+            prompt: "Active serious offence (e.g., gunshots, armed robbery, abduction) just occurred. You establish a containment perimeter or targeted roadblock near the scene.",
+            operationalGuidance: [
+              "Limit stops geographically and temporally to vehicles/persons exiting the immediate containment zone.",
+              "Keep initial screening brief and focused on the specific threat (weapons/suspect description)."
+            ],
+            choices: [
+              { label: "Suspect / Weapon Located → Arrest & Secure Scene", next: "em_seize_arrest" },
+              { label: "Vehicle Cleared → Release Immediately", next: "em_exit" }
+            ],
+            statutes: [
+              { code: "Common Law Ancillary Power (R. v. Clayton)", text: "Targeted stops at a roadblock near a violent crime scene are lawful when reasonably necessary to respond to a serious, immediate threat." }
+            ],
+            cases: ["clayton", "mann"],
+            articulation: [
+              "Document distance from crime scene, time elapsed since 911 call, and reason perimeter was set at that intersection."
+            ],
+            traps: [
+              "Keeping a containment roadblock running hours after the threat has dissipated or searching trunks of obviously uninvolved commuters."
+            ]
+          },
+          em_feeney_check: {
+            title: "Suspect Inside Dwelling: Warrant vs. Exigent Entry",
+            threshold: "FEENEY WARRANT (CCC s. 529) vs. EXIGENCY (s. 529.3)",
+            thresholdColor: "crimson",
+            prompt: "You have RPG to arrest a suspect who is inside a private dwelling house. Entry requires EITHER a Feeney Warrant (CCC s. 529), Informed Consent, OR Exigent Circumstances (CCC s. 529.3).",
+            operationalGuidance: [
+              "Contain the exterior exits while evaluating urgency.",
+              "Exigent circumstances (s. 529.3) require RPG to arrest PLUS reasonable grounds to suspect entry is necessary to prevent imminent bodily harm/death OR imminent loss/destruction of evidence."
+            ],
+            choices: [
+              { label: "Imminent Harm or Evidence Destruction → Forced Exigent Entry (s. 529.3)", next: "em_seize_arrest" },
+              { label: "No Exigency → Hold Perimeter & Obtain Telewarrant / Feeney Warrant", next: "em_warrant_hold" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 529 & s. 529.1", text: "Authorization to enter a dwelling house to carry out an arrest ('Feeney Warrant')." },
+              { code: "Criminal Code s. 529.3", text: "Warrantless entry to arrest in exigent circumstances (imminent bodily harm/death or imminent loss/destruction of evidence)." },
+              { code: "Criminal Code s. 117.02 / s. 487.11", text: "Exigent warrantless search/seizure for weapons (s. 117.02) or general offences (s. 487.11) where RPG + urgency exist." }
+            ],
+            cases: ["feeney", "godoy", "stairs"],
+            articulation: [
+              "If entering under s. 529.3, explicitly articulate WHY waiting for a telewarrant was impracticable (e.g., active assault heard inside, suspect flushing drugs, armed suspect loading firearm)."
+            ],
+            traps: [
+              "Entering a home without a warrant to arrest a non-violent suspect simply because 'it's late at night and a telewarrant takes 2 hours' is a classic Feeney breach."
+            ]
+          },
+          em_warrant_hold: {
+            title: "Perimeter Containment Pending Warrant",
+            threshold: "SECURING THE STATUS QUO",
+            thresholdColor: "amber",
+            prompt: "Maintain exterior visual containment to prevent escape while drafting an ITO (Information to Obtain) for a s. 529 Feeney Warrant and/or s. 487 Search Warrant.",
+            operationalGuidance: [
+              "Do NOT enter the dwelling or fenced backyard while waiting unless new exigent circumstances erupt."
+            ],
+            choices: [
+              { label: "Warrant Granted → Announce & Execute Entry", next: "em_seize_arrest" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 529.4", text: "Requirement to announce presence before entering unless announced entry would endanger safety or cause evidence destruction." }
+            ],
+            cases: ["feeney", "le"],
+            articulation: [
+              "Record exact time perimeter established and time judicial authorization granted."
+            ],
+            traps: [
+              "Stepping onto a back deck or peering into basement windows while holding perimeter violates s. 8 privacy."
+            ]
+          },
+          em_seize_arrest: {
+            title: "Arrest Inside Dwelling & Scene Preservation",
+            threshold: "R. v. STAIRS SEARCH LIMITS",
+            thresholdColor: "crimson",
+            prompt: "Suspect arrested inside dwelling. Apply R. v. Stairs rules before searching rooms beyond the suspect's immediate reach.",
+            operationalGuidance: [
+              "Immediate physical reach of arrestee: searchable incident to arrest.",
+              "Rest of the home (e.g., upstairs bedrooms, basement): searchable incident to arrest ONLY if you have reasonable suspicion of a safety risk (hidden accomplice/weapon) AND search is tailored to clearing that risk.",
+              "To search for evidence throughout the home, freeze/secure the scene and obtain a s. 487 Search Warrant."
+            ],
+            choices: [
+              { label: "Clear Safety Sweep Complete → Secure Scene / Transport Prisoner", next: "em_exit" }
+            ],
+            statutes: [
+              { code: "Common Law (R. v. Stairs)", text: "Governs search of a home incident to arrest; distinguishes immediate physical control from broader home areas." },
+              { code: "Criminal Code s. 489", text: "Seizure of things in plain view during lawful execution of duties." }
+            ],
+            cases: ["stairs", "feeney"],
+            articulation: [
+              "Distinguish safety sweep observations from evidentiary search; apply for s. 487 warrant before opening closed containers/drawers in other rooms."
+            ],
+            traps: [
+              "Tearing apart a suspect's bedroom after arresting them in the front hallway without a s. 487 search warrant."
+            ]
+          },
+          em_exit: {
+            title: "Emergency Cleared & Scene Handover",
+            threshold: "DUTY CONCLUDED",
+            thresholdColor: "emerald",
+            prompt: "Ensure victim safety referrals, secure damaged entry doors if forced under Godoy/exigency, and complete detailed use-of-force/entry report.",
+            operationalGuidance: [
+              "Log all witnesses, victim statements, and exact justification for any forced entry."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 25", text: "Document reasonableness of entry and any property damage caused during emergency response." }
+            ],
+            cases: ["godoy"],
+            articulation: [
+              "Record time police exited the premises."
+            ],
+            traps: []
+          }
+        }
+      },
+      {
+        id: "door_knock",
+        code: "MOD-04",
+        title: "Door Knocks, Knock-and-Talk & Dwelling Privacy",
+        subtitle: "Implied License (Evans) / Backyard Trespass (Le) / Informed Consent (Wills)",
+        badge: "R. v. Evans / R. v. Le",
+        startNode: "dk_start",
+        nodes: {
+          dk_start: {
+            title: "Approaching a Private Residence (Implied License)",
+            threshold: "IMPLIED LICENSE TO KNOCK (R. v. Evans)",
+            thresholdColor: "sky",
+            prompt: "You attend a residence without a warrant to speak with an occupant (e.g., follow-up witness interview, complainant follow-up, or suspect knock-and-talk).",
+            operationalGuidance: [
+              "Walk directly along the normal public walkway to the front door.",
+              "Do NOT walk around the side of the house, peer through windows, or enter a fenced backyard (R. v. Le).",
+              "Your lawful purpose must be to communicate with the occupant—NOT to sniff for drugs or gather surreptitious evidence."
+            ],
+            choices: [
+              { label: "Occupant Answers Front Door → Request to Speak / Enter", next: "dk_answer" },
+              { label: "No Answer at Front Door → Leave Card & Depart", next: "dk_no_answer" },
+              { label: "Occupant Tells Police to Leave Property → Immediate Exit", next: "dk_revoked" }
+            ],
+            statutes: [
+              { code: "Charter s. 8", text: "Highest reasonable expectation of privacy attaches to a private dwelling house and its immediate perimeter." }
+            ],
+            cases: ["evans", "le", "feeney"],
+            articulation: [
+              "Document path walked (front walkway to front door) and purpose of attendance."
+            ],
+            traps: [
+              "R. v. Evans Trap: Knocking on a door specifically so you can smell marijuana/meth inside when the door opens exceeds the implied license and constitutes an unconstitutional s. 8 search."
+            ]
+          },
+          dk_answer: {
+            title: "Occupant Answers Door: Seeking Consent to Enter",
+            threshold: "INFORMED VOLUNTARY CONSENT (R. v. Wills)",
+            thresholdColor: "amber",
+            prompt: "An adult occupant with control over the premises opens the door. You wish to step inside to speak or look around.",
+            operationalGuidance: [
+              "To rely on consent entry, the occupant must give voluntary, informed consent—knowing they have the right to say NO and knowing the true purpose of your entry.",
+              "Do NOT step across the threshold ('foot in the door') until clear permission is granted."
+            ],
+            choices: [
+              { label: "Occupant Gives Clear, Informed Consent to Enter", next: "dk_inside" },
+              { label: "Occupant Refuses Entry (Speaks at Door or Closes Door)", next: "dk_revoked" },
+              { label: "Plain-View Emergency / Life Threat Observed Inside → Godoy Entry", next: "dk_emergency" }
+            ],
+            statutes: [
+              { code: "Charter s. 8 (R. v. Wills Consent Standard)", text: "Valid waiver of s. 8 privacy requires awareness of the right to refuse and the potential consequences of consenting." }
+            ],
+            cases: ["evans", "feeney", "le"],
+            articulation: [
+              "Quote your exact request ('May we step inside to speak with you? You don't have to let us in') and the occupant's exact words of consent."
+            ],
+            traps: [
+              "Saying 'We're coming in to have a look around' and treating passive silence as consent is an unlawful warrantless entry."
+            ]
+          },
+          dk_inside: {
+            title: "Inside Residence by Consent: Scope & Revocation",
+            threshold: "CONSENT CAN BE REVOKED ANYTIME",
+            thresholdColor: "amber",
+            prompt: "You are inside the entryway/living room by consent. Stay strictly within the physical area permitted by the occupant.",
+            operationalGuidance: [
+              "Do NOT wander into hallways, bedrooms, or basements without explicit permission.",
+              "If the occupant says 'I want you to leave now', you MUST exit immediately unless independent arrest/exigent grounds have arisen."
+            ],
+            choices: [
+              { label: "Interview Complete or Consent Revoked → Exit Immediately", next: "dk_revoked" },
+              { label: "Occupant Confesses / RPG Arises to Arrest → Arrest Inside", next: "dk_arrest" }
+            ],
+            statutes: [
+              { code: "Charter s. 8 & s. 9", text: "Remaining in a home after consent is withdrawn makes police trespassers and renders any subsequent arrest unlawful under Feeney." }
+            ],
+            cases: ["feeney", "stairs"],
+            articulation: [
+              "Note which room you remained in and that you stayed in the occupant's presence throughout."
+            ],
+            traps: [
+              "Asking to use the washroom as a pretext to peek into bedrooms along the hallway."
+            ]
+          },
+          dk_arrest: {
+            title: "Arrest Following Consensual Entry",
+            threshold: "RPG + LAWFUL PRESENCE",
+            thresholdColor: "crimson",
+            prompt: "While lawfully inside by valid informed consent, you form RPG to arrest the occupant (e.g., they admit to an offence or match positive ID).",
+            operationalGuidance: [
+              "Inform subject they are under arrest, read Charter s. 10(a)/(b) and Police Caution.",
+              "Apply R. v. Stairs limits: search immediate reach only unless safety suspicion justifies a protective sweep."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 495(1)", text: "Lawful arrest inside dwelling when police are lawfully present by valid consent." }
+            ],
+            cases: ["feeney", "stairs"],
+            articulation: [
+              "Document valid initial consent prior to forming RPG to satisfy Feeney."
+            ],
+            traps: []
+          },
+          dk_emergency: {
+            title: "Plain-View Emergency Upon Door Opening",
+            threshold: "EXIGENT CIRCUMSTANCES / GODOY",
+            thresholdColor: "crimson",
+            prompt: "When the door opens, you see or hear an active assault, severe injury, or weapon threat.",
+            operationalGuidance: [
+              "Enter immediately under common law life-safety duty (Godoy) or CCC s. 529.3 / s. 117.02.",
+              "Neutralize threat, render medical aid, and secure scene."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 529.3 / s. 117.02", text: "Exigent warrantless entry to prevent imminent bodily harm or death." }
+            ],
+            cases: ["godoy", "feeney"],
+            articulation: [
+              "Detail exact visual/auditory emergency indicators observed from the threshold."
+            ],
+            traps: []
+          },
+          dk_no_answer: {
+            title: "No Answer at Front Door",
+            threshold: "IMPLIED LICENSE EXHAUSTED",
+            thresholdColor: "emerald",
+            prompt: "Nobody answers the front door. Your implied license to remain on the property ends.",
+            operationalGuidance: [
+              "Leave a business card if appropriate and exit the property via the front walkway.",
+              "Do NOT hop fences or check back doors."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Charter s. 8 (R. v. Le)", text: "Entering private side/backyards without a warrant or exigency is an unlawful search." }
+            ],
+            cases: ["evans", "le"],
+            articulation: [
+              "Log time of knock, lack of response, and immediate departure."
+            ],
+            traps: []
+          },
+          dk_revoked: {
+            title: "Exit Property Immediately",
+            threshold: "TRESPASS AVOIDED",
+            thresholdColor: "emerald",
+            prompt: "Depart the property promptly and peacefully. If an arrest warrant or search warrant is required, apply through judicial channels.",
+            operationalGuidance: [
+              "Do not argue at the doorstep once told to leave."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Charter s. 8", text: "Respecting revocation preserves admissibility of future warranted steps." }
+            ],
+            cases: ["evans", "feeney"],
+            articulation: [
+              "Record exact time occupant asked police to leave and immediate compliance."
+            ],
+            traps: []
+          }
+        }
+      },
+      {
+        id: "witnessed_arrest",
+        code: "MOD-05",
+        title: "Witnessed Crime, Arrest & Post-Arrest Ladder",
+        subtitle: "CCC s.495(2) Public Interest / Charter s.10(b) / Cell Phones / Release Ladder",
+        badge: "CCC s.495 / s.498 / s.503",
+        startNode: "wa_start",
+        nodes: {
+          wa_start: {
+            title: "Witnessed Offence or RPG of Offence (CCC s. 495)",
+            threshold: "RPG + PUBLIC INTEREST ASSESSMENT (s. 495(2))",
+            thresholdColor: "crimson",
+            prompt: "You find a person committing an offence OR have RPG they committed an indictable offence. BEFORE arresting for a summary, hybrid, or s. 553 indictable offence, you MUST apply CCC s. 495(2).",
+            operationalGuidance: [
+              "Check CCC s. 495(2): You SHALL NOT arrest for a summary/hybrid/s. 553 offence if public interest (Identity, Evidence preservation, Prevent continuation/repetition, Court attendance) can be satisfied WITHOUT arrest (e.g., Appearance Notice).",
+              "If any s. 495(2) factor requires arrest (e.g., unknown ID, ongoing assault/theft, risk of destroying evidence, flight risk), proceed to arrest."
+            ],
+            choices: [
+              { label: "s. 495(2) Satisfied Without Arrest → Issue Appearance Notice (No Arrest)", next: "wa_app_notice" },
+              { label: "Arrest Required (s. 495(1) + Public Interest Need) → Effect Arrest", next: "wa_arrest" }
+            ],
+            statutes: [
+              { code: "Criminal Code s. 495(1)", text: "Peace officer may arrest without warrant: (a) committed/about to commit indictable offence, (b) found committing any criminal offence, (c) active arrest warrant." },
+              { code: "Criminal Code s. 495(2)", text: "Mandatory duty NOT to arrest for summary/hybrid/s. 553 offences unless necessary to establish identity, secure evidence, prevent continuation/repetition, or ensure court attendance." }
+            ],
+            cases: ["tim", "golden"],
+            articulation: [
+              "Explicitly record WHICH s. 495(2) public interest ground(s) necessitated the arrest (e.g., 'Arrested to prevent continuation of mischief and confirm unverified identity')."
+            ],
+            traps: [
+              "Arresting a cooperative local resident with valid government ID for a minor shoplifting or causing a disturbance when the offence has already stopped violates CCC s. 495(2)."
+            ]
+          },
+          wa_app_notice: {
+            title: "Compelling Appearance Without Arrest (CCC s. 497)",
+            threshold: "LEAST RESTRICTIVE MEASURE",
+            thresholdColor: "emerald",
+            prompt: "Identity is verified, evidence is secure, offence has ceased, and attendance is likely. Issue Form 9 Appearance Notice on scene without arresting.",
+            operationalGuidance: [
+              "Verify name, DOB, and current address.",
+              "Complete Appearance Notice with court date/location and fingerprint date (Identification of Criminals Act) if hybrid/indictable."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 497", text: "Issuance of Appearance Notice by peace officer where arrest is unnecessary under s. 495(2)." }
+            ],
+            cases: [],
+            articulation: [
+              "Document ID verification method and service of Appearance Notice."
+            ],
+            traps: [
+              "Cannot include fingerprint compulsion on an Appearance Notice for a pure summary conviction offence."
+            ]
+          },
+          wa_arrest: {
+            title: "Arrest Execution & Charter s. 10(a)/(b) Duties",
+            threshold: "IMMEDIATE INFORMATIONAL & IMPLEMENTATIONAL DUTIES",
+            thresholdColor: "crimson",
+            prompt: "Inform subject they are under arrest and state the specific offence (s. 10(a)). Read Charter s. 10(b) and Primary Police Caution immediately.",
+            operationalGuidance: [
+              "Use only reasonable, necessary force to control and handcuff (CCC s. 25(1)).",
+              "Ask clearly: 'Do you understand? Do you wish to call a lawyer?'",
+              "Once at detachment/phone, facilitate private contact with chosen counsel or 24-hr Legal Aid Duty Counsel BEFORE eliciting any statements ('hold-off' duty)."
+            ],
+            choices: [
+              { label: "Conduct Search Incident to Arrest (Person, Bags, Cell Phone Rules)", next: "wa_search_ita" }
+            ],
+            statutes: [
+              { code: "Charter s. 10(a) & s. 10(b)", text: "Informational duty (tell right to counsel/duty counsel) + Implementational duty (provide private phone access without delay and hold off questioning)." },
+              { code: "Criminal Code s. 25(1) & s. 29(2)", text: "Must give notice of reason for arrest where feasible." }
+            ],
+            cases: ["suberu", "grant", "tim"],
+            articulation: [
+              "Record exact wording of arrest, time of s. 10(b) readout, prisoner's exact response, and exact times of counsel call."
+            ],
+            traps: [
+              "Questioning an arrestee in the back of the cruiser after they said 'Yes, I want a lawyer' violates the s. 10(b) hold-off obligation and will exclude their answers."
+            ]
+          },
+          wa_search_ita: {
+            title: "Search Incident to Arrest: Standard vs. Cell Phones vs. Strip Search",
+            threshold: "STRICT TIERED SEARCH RULES",
+            thresholdColor: "amber",
+            prompt: "Search incident to arrest is NOT unlimited. Apply the correct legal threshold depending on what is being searched:",
+            operationalGuidance: [
+              "1. Standard Frisk & Immediate Bags (Cloutier): Lawful on every valid arrest for weapons, escape tools, and evidence.",
+              "2. Cell Phones / Digital Devices (R. v. Fearon): Strictly limited cursory look ONLY if truly incidental to arrest (e.g., active accomplice comms/recent texts), tailored narrowly, and every step logged in detail. Otherwise seize and seek s. 487 warrant.",
+              "3. Strip Search (R. v. Golden): NEVER routine. Requires RPG that strip search is necessary to find hidden weapons/evidence related to the arrest, conducted in private by same-sex officer at detachment."
+            ],
+            choices: [
+              { label: "Search Complete → Apply Post-Arrest Release Ladder (CCC s. 498 / s. 503)", next: "wa_release_ladder" }
+            ],
+            statutes: [
+              { code: "Common Law (Cloutier / Fearon / Golden)", text: "Graduated privacy protections governing personal searches incident to arrest." }
+            ],
+            cases: ["fearon", "golden", "caslake"],
+            articulation: [
+              "If a cell phone is examined under Fearon, write an exhaustive log of every app/folder opened, why it was searched, and exact duration."
+            ],
+            traps: [
+              "Scrolling through years of photos or banking apps on an arrestee's unlocked phone violates R. v. Fearon; strip-searching every prisoner lodged in cells violates R. v. Golden."
+            ]
+          },
+          wa_release_ladder: {
+            title: "Post-Arrest Release Ladder (CCC s. 493.1 / s. 498 / s. 503)",
+            threshold: "PRINCIPLE OF RESTRAINT (CCC s. 493.1)",
+            thresholdColor: "sky",
+            prompt: "Under CCC s. 493.1, peace officers MUST give primary consideration to releasing the accused at the earliest reasonable opportunity on the least onerous conditions appropriate.",
+            operationalGuidance: [
+              "Step 1: Unconditional Release / Appearance Notice (Form 9) if public interest concerns are now resolved (e.g., ID confirmed, sober, scene cleared).",
+              "Step 2: Undertaking to Peace Officer (Form 10 — CCC s. 498 / s. 503) with tailored conditions (no-contact, boundary, abstain) ONLY where necessary to prevent repetition, protect victims, or ensure court attendance.",
+              "Step 3: Hold for Judicial Interim Release (Bail Hearing within 24 hours — CCC s. 503) ONLY where detention is justified under primary/secondary/tertiary grounds (s. 515(10))."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Criminal Code s. 493.1", text: "Codifies the 'ladder principle'—earliest release on least onerous conditions." },
+              { code: "Criminal Code s. 498 & s. 503(1)", text: "Duty of arresting officer / Officer in Charge to release as soon as practicable unless detention is required." }
+            ],
+            cases: [],
+            articulation: [
+              "Justify each condition on a Form 10 Undertaking (must tie directly to victim safety, evidence protection, or non-repetition) OR justify bail hold under s. 515(10)."
+            ],
+            traps: [
+              "Adding blanket 'abstain from alcohol/drugs' or 'curfew' conditions on a Form 10 Undertaking when the offence had nothing to do with substance use or nighttime offending."
+            ]
+          }
+        }
+      },
+      {
+        id: "youth_vulnerable",
+        code: "MOD-06",
+        title: "Youth (YCJA) & Mental Health Apprehensions",
+        subtitle: "YCJA s.25 / s.146 Statement Safeguards & Alberta Mental Health Act Form 10",
+        badge: "YCJA / AB MHA s.12",
+        startNode: "yv_start",
+        nodes: {
+          yv_start: {
+            title: "Vulnerable Person / Youth Encounter Triage",
+            threshold: "ENHANCED STATUTORY PROTECTIONS",
+            thresholdColor: "purple",
+            prompt: "Select the applicable statutory regime governing the subject:",
+            operationalGuidance: [
+              "Young Person (aged 12 to 17 at time of offence): Youth Criminal Justice Act (YCJA) mandatory protections apply on top of the Charter.",
+              "Person in Acute Mental Health Crisis: Alberta Mental Health Act (MHA) apprehension criteria."
+            ],
+            choices: [
+              { label: "Young Person (Ages 12–17) Detained or Arrested (YCJA)", next: "yv_ycja" },
+              { label: "Person Experiencing Mental Disorder & Danger (AB Mental Health Act)", next: "yv_mha" }
+            ],
+            statutes: [
+              { code: "YCJA s. 2(1)", text: "Defines 'young person' as 12 years or older but under 18 years of age." },
+              { code: "Alberta Mental Health Act (MHA) s. 12", text: "Peace officer apprehension power without warrant." }
+            ],
+            cases: ["suberu", "grant"],
+            articulation: [
+              "Confirm exact date of birth immediately upon encountering a suspected youth."
+            ],
+            traps: [
+              "Under age 12: Criminal immunity applies (CCC s. 13)—cannot be arrested or charged criminally; engage child welfare/parents."
+            ]
+          },
+          yv_ycja: {
+            title: "YCJA Detained/Arrested Youth Safeguards (s. 25, s. 26, s. 146)",
+            threshold: "STRICT ADMISSIBILITY RULES (YCJA s. 146)",
+            thresholdColor: "crimson",
+            prompt: "When detaining or arresting a youth (ages 12–17), standard adult Charter warnings are INSUFFICIENT. Failure to comply with YCJA s. 146 renders any statement completely inadmissible.",
+            operationalGuidance: [
+              "1. Extrajudicial Measures First (YCJA s. 4 & s. 6): Consider warning, caution, or referral before charging.",
+              "2. Notice to Parents (YCJA s. 26): Must give notice of arrest/detention to parent/guardian as soon as possible.",
+              "3. Enhanced Rights Readout (YCJA s. 25 & s. 146): Explain in age-appropriate language: (a) right to silence, (b) right to counsel without delay, AND (c) right to consult and have a parent/appropriate adult present during questioning.",
+              "4. Written Waiver (s. 146(4)): If youth waives counsel/adult presence, waiver MUST be recorded on audio/video or signed in writing."
+            ],
+            choices: [],
+            statutes: [
+              { code: "YCJA s. 25 & s. 26", text: "Right to counsel + mandatory parental notification upon arrest or detention." },
+              { code: "YCJA s. 146(2)", text: "Strict statutory preconditions for admissibility of any oral or written statement made by a young person to a person in authority." }
+            ],
+            cases: ["suberu", "grant"],
+            articulation: [
+              "Use an approved YCJA Youth Statement / Rights Form, video-record the entire rights explanation, and log time parent was notified."
+            ],
+            traps: [
+              "Taking a statement from a 16-year-old after reading only an adult Charter card—automatically inadmissible under YCJA s. 146."
+            ]
+          },
+          yv_mha: {
+            title: "Alberta Mental Health Act Apprehension (MHA s. 12)",
+            threshold: "REASONABLE & PROBABLE GROUNDS OF DANGER",
+            thresholdColor: "amber",
+            prompt: "Under Alberta Mental Health Act s. 12, a peace officer may apprehend a person without warrant and convey them to a designated facility for examination ONLY when ALL statutory criteria are met:",
+            operationalGuidance: [
+              "Criterion 1: Person is suffering from a mental disorder.",
+              "Criterion 2: Person is in a condition presenting a danger to themselves OR others.",
+              "Criterion 3: Person is unsuitable for admission to a facility other than as a formal patient.",
+              "Complete Alberta Form 10 (Statement of Peace Officer on Apprehension) and convey safely to designated hospital/facility."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Alberta Mental Health Act s. 12(1)", text: "Authorizes warrantless apprehension and conveyance to a facility where RPG exists that person has a mental disorder and presents a danger to self or others." },
+              { code: "Alberta MHA s. 12(2)", text: "Officer retains lawful custody until examination is completed or person is admitted/released by facility." }
+            ],
+            cases: ["godoy"],
+            articulation: [
+              "Detail specific observed behaviours, suicidal/homicidal statements, and inability to care for self on Form 10—avoid vague labels like 'acting crazy'."
+            ],
+            traps: [
+              "Apprehending someone under MHA s. 12 simply because they are eccentric, intoxicated without mental disorder danger, or refusing medical care while competent."
+            ]
+          }
+        }
+      }
+    ];
+
+    // =========================================================================
+    // 3. APPLICATION STATE & ENGINE
+    // =========================================================================
+    let state = {
+      scenarioId: "traffic_stop",
+      history: ["ts_start"],
+      inspectorTab: "statutes"
+    };
+
+    const thresholdBadgeStyles = {
+      emerald: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+      sky: "bg-sky-500/15 text-sky-300 border-sky-500/40",
+      amber: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+      crimson: "bg-red-500/15 text-red-300 border-red-500/40",
+      purple: "bg-purple-500/15 text-purple-300 border-purple-500/40"
+    };
+
+    function getCurrentScenario() {
+      return SCENARIOS.find(s => s.id === state.scenarioId);
+    }
+
+    function getCurrentNode() {
+      const scenario = getCurrentScenario();
+      const nodeId = state.history[state.history.length - 1];
+      return { id: nodeId, data: scenario.nodes[nodeId] };
+    }
+
+    function selectScenario(id, targetNodeId = null) {
+      const sc = SCENARIOS.find(s => s.id === id);
+      if (!sc) return;
+      state.scenarioId = id;
+      state.history = [targetNodeId || sc.startNode];
+      renderAll();
+    }
+
+    function chooseBranch(nextNodeId) {
+      const sc = getCurrentScenario();
+      if (!sc.nodes[nextNodeId]) return;
+      state.history.push(nextNodeId);
+      renderAll();
+    }
+
+    function stepBack() {
+      if (state.history.length > 1) {
+        state.history.pop();
+        renderAll();
+      }
+    }
+
+    function resetScenario() {
+      const sc = getCurrentScenario();
+      state.history = [sc.startNode];
+      renderAll();
+    }
+
+    function jumpToHistory(index) {
+      state.history = state.history.slice(0, index + 1);
+      renderAll();
+    }
+
+    function switchInspectorTab(tab) {
+      state.inspectorTab = tab;
+      ['statutes', 'caselaw', 'articulation'].forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        if (t === tab) {
+          el.className = "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition";
+        } else {
+          el.className = "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
+        }
+      });
+      renderInspector();
+    }
+
+    // =========================================================================
+    // 4. RENDER FUNCTIONS
+    // =========================================================================
+    function renderModuleList() {
+      const container = document.getElementById("moduleList");
+      document.getElementById("scenarioCount").textContent = `${SCENARIOS.length} MODULES`;
+      container.innerHTML = SCENARIOS.map(sc => {
+        const active = sc.id === state.scenarioId;
+        return `
+          <button onclick="selectScenario('${sc.id}')"
+            class="w-full text-left p-3 rounded-md border transition ${
+              active
+                ? 'bg-sky-500/10 border-sky-500/50 shadow-sm'
+                : 'bg-tac-card/60 border-tac-border hover:bg-tac-hover hover:border-slate-600'
+            }">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-mono font-bold ${active ? 'text-sky-400' : 'text-slate-400'}">${sc.code}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-tac-bg text-slate-300 border border-tac-border">${sc.badge}</span>
+            </div>
+            <div class="text-xs font-bold ${active ? 'text-white' : 'text-slate-200'}">${sc.title}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${sc.subtitle}</div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderBreadcrumbs() {
+      const sc = getCurrentScenario();
+      const trail = document.getElementById("breadcrumbTrail");
+      document.getElementById("btnBack").disabled = state.history.length <= 1;
+
+      trail.innerHTML = state.history.map((nodeId, idx) => {
+        const node = sc.nodes[nodeId];
+        const isLast = idx === state.history.length - 1;
+        return `
+          <button onclick="jumpToHistory(${idx})"
+            class="px-2 py-0.5 rounded transition ${
+              isLast
+                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-semibold'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-tac-card'
+            }">
+            ${idx + 1}. ${node.title.split(':')[0]}
+          </button>
+          ${!isLast ? '<span class="text-slate-600">→</span>' : ''}
+        `;
+      }).join("");
+    }
+
+    function renderCenterNode() {
+      const sc = getCurrentScenario();
+      const { data: node } = getCurrentNode();
+      const viewport = document.getElementById("nodeViewport");
+      const badgeStyle = thresholdBadgeStyles[node.thresholdColor] || thresholdBadgeStyles.sky;
+
+      const guidanceHtml = node.operationalGuidance.map(item => `
+        <li class="flex items-start gap-2.5 text-sm text-slate-200">
+          <span class="text-sky-400 font-mono font-bold mt-0.5">▸</span>
+          <span>${item}</span>
+        </li>
+      `).join("");
+
+      const choicesHtml = node.choices.length > 0
+        ? node.choices.map((ch, idx) => `
+            <button onclick="chooseBranch('${ch.next}')"
+              class="w-full text-left p-3.5 rounded-lg bg-tac-card hover:bg-tac-hover border border-tac-border hover:border-sky-400/60 transition group flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 rounded bg-tac-bg border border-tac-border group-hover:border-sky-400 group-hover:text-sky-400 font-mono text-xs flex items-center justify-center text-slate-400 shrink-0">
+                  ${String.fromCharCode(65 + idx)}
+                </span>
+                <span class="text-sm font-medium text-slate-100 group-hover:text-white">${ch.label}</span>
+              </div>
+              <span class="font-mono text-xs text-slate-500 group-hover:text-sky-400 shrink-0">PROCEED →</span>
+            </button>
+          `).join("")
+        : `
+          <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+            <div>
+              <div class="font-mono text-xs font-bold text-emerald-400 uppercase">✓ Encounter Branch Terminal Node</div>
+              <p class="text-xs text-slate-300 mt-0.5">Review statutory authorities and export your articulation notes in the top bar.</p>
+            </div>
+            <button onclick="resetScenario()" class="px-3 py-1.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-semibold">
+              ↺ RESTART MODULE
+            </button>
+          </div>
+        `;
+
+      viewport.innerHTML = `
+        <div class="bg-tac-panel border border-tac-border rounded-xl p-6 shadow-xl space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-tac-border pb-4">
+            <div>
+              <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">${sc.code} // ${sc.title}</div>
+              <h2 class="text-xl font-bold text-white mt-1">${node.title}</h2>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-mono font-bold border ${badgeStyle}">
+              ${node.threshold}
+            </span>
+          </div>
+
+          <div class="bg-tac-bg/80 border border-tac-border rounded-lg p-4 text-sm text-slate-200 leading-relaxed">
+            ${node.prompt}
+          </div>
+
+          <div>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 font-semibold mb-2.5">Operational &amp; Tactical Action Steps</h3>
+            <ul class="space-y-2">
+              ${guidanceHtml}
+            </ul>
+          </div>
+
+          <div class="pt-2 border-t border-tac-border">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-sky-400 font-semibold mb-3">Select Next Operational Decision</h3>
+            <div class="space-y-2.5">
+              ${choicesHtml}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInspector() {
+      const { data: node } = getCurrentNode();
+      const container = document.getElementById("inspectorContent");
+
+      if (state.inspectorTab === "statutes") {
+        container.innerHTML = `
+          <div class="text-[11px] font-mono uppercase text-slate-400">Governing Statutory &amp; Common Law Authority</div>
+          ${node.statutes.map(st => `
+            <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-1.5">
+              <div class="font-mono text-xs font-bold text-sky-400">${st.code}</div>
+              <p class="text-xs text-slate-300 leading-relaxed">${st.text}</p>
+            </div>
+          `).join("")}
+        `;
+      } else if (state.inspectorTab === "caselaw") {
+        if (!node.cases || node.cases.length === 0) {
+          container.innerHTML = `<div class="text-xs text-slate-400 font-mono">No specific appellate cases tagged to this terminal step.</div>`;
+          return;
+        }
+        container.innerHTML = `
+          <div class="text-[11px] font-mono uppercase text-slate-400">Binding Jurisprudence (${node.cases.length})</div>
+          ${node.cases.map(key => {
+            const c = CASE_LIBRARY[key];
+            if (!c) return "";
+            return `
+              <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-mono text-xs font-bold text-amber-400">${c.title}</span>
+                </div>
+                <div class="text-[10px] font-mono uppercase text-sky-400">${c.topic}</div>
+                <p class="text-xs text-slate-300 leading-relaxed">${c.holding}</p>
+              </div>
+            `;
+          }).join("")}
+        `;
+      } else if (state.inspectorTab === "articulation") {
+        const notesHtml = node.articulation.map(n => `
+          <li class="flex items-start gap-2 text-xs text-slate-200">
+            <span class="text-emerald-400 font-mono font-bold">✓</span>
+            <span>${n}</span>
+          </li>
+        `).join("");
+
+        const trapsHtml = node.traps.length > 0
+          ? node.traps.map(t => `
+              <div class="p-3 rounded-lg bg-red-950/30 border border-red-500/40 text-xs text-red-200 leading-relaxed">
+                <span class="font-mono font-bold text-red-400 block mb-1">⚠ CHARTER / s. 24(2) EXCLUSION TRAP</span>
+                ${t}
+              </div>
+            `).join("")
+          : `<div class="text-xs text-slate-400 font-mono">No specific Charter traps flagged at this step.</div>`;
+
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <div class="text-[11px] font-mono uppercase text-emerald-400 font-semibold mb-2">Mandatory Notebook Articulation</div>
+              <ul class="space-y-2 bg-tac-card border border-tac-border rounded-lg p-3.5">
+                ${notesHtml}
+              </ul>
+            </div>
+            <div>
+              <div class="text-[11px] font-mono uppercase text-red-400 font-semibold mb-2">Pitfalls &amp; Exclusion Risks</div>
+              <div class="space-y-2.5">
+                ${trapsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderAll() {
+      renderModuleList();
+      renderBreadcrumbs();
+      renderCenterNode();
+      renderInspector();
+    }
+
+    // =========================================================================
+    // 5. SEARCH, MODALS & EXPORT LOG
+    // =========================================================================
+    function openModal(id) {
+      document.getElementById(id).classList.remove("hidden");
+      if (id === "caseIndexModal") renderCaseIndex();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add("hidden");
+    }
+
+    function renderCaseIndex(filter = "") {
+      const list = document.getElementById("caseIndexList");
+      const q = filter.toLowerCase();
+      const entries = Object.values(CASE_LIBRARY).filter(c =>
+        c.title.toLowerCase().includes(q) ||
+        c.topic.toLowerCase().includes(q) ||
+        c.holding.toLowerCase().includes(q)
+      );
+      list.innerHTML = entries.map(c => `
+        <div class="p-3.5 rounded bg-tac-card border border-tac-border space-y-1">
+          <div class="font-mono font-bold text-amber-400">${c.title}</div>
+          <div class="text-[10px] font-mono uppercase text-sky-400">${c.topic}</div>
+          <p class="text-slate-300 leading-relaxed pt-1">${c.holding}</p>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("caseFilterInput").addEventListener("input", (e) => {
+      renderCaseIndex(e.target.value);
+    });
+
+    function openExportModal() {
+      const sc = getCurrentScenario();
+      const lines = [
+        `LEX-OPS // ENCOUNTER DECISION & AUTHORITY LOG`,
+        `MODULE: ${sc.code} - ${sc.title}`,
+        `GENERATED: ${new Date().toLocaleString()}`,
+        `============================================================`,
+        ``
+      ];
+
+      state.history.forEach((nodeId, idx) => {
+        const n = sc.nodes[nodeId];
+        lines.push(`STEP ${idx + 1}: ${n.title}`);
+        lines.push(`LEGAL THRESHOLD: ${n.threshold}`);
+        lines.push(`STATUTES: ${n.statutes.map(s => s.code).join(" | ")}`);
+        if (n.cases && n.cases.length) {
+          lines.push(`CASE LAW: ${n.cases.map(k => CASE_LIBRARY[k]?.title).join(" | ")}`);
+        }
+        lines.push(`ARTICULATION CHECKLIST:`);
+        n.articulation.forEach(a => lines.push(`  - ${a}`));
+        lines.push(`------------------------------------------------------------`);
+      });
+
+      document.getElementById("exportTextarea").value = lines.join("\n");
+      openModal("exportModal");
+    }
+
+    function copyExportText() {
+      const ta = document.getElementById("exportTextarea");
+      ta.select();
+      navigator.clipboard.writeText(ta.value);
+      const btn = document.getElementById("copyBtn");
+      btn.textContent = "✓ COPIED";
+      setTimeout(() => (btn.textContent = "COPY TO CLIPBOARD"), 1500);
+    }
+
+    // Global Search
+    const searchInput = document.getElementById("globalSearch");
+    const searchResults = document.getElementById("searchResults");
+
+    searchInput.addEventListener("input", (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) {
+        searchResults.classList.add("hidden");
+        return;
+      }
+
+      const matches = [];
+      SCENARIOS.forEach(sc => {
+        Object.entries(sc.nodes).forEach(([nodeId, node]) => {
+          const blob = `${node.title} ${node.prompt} ${node.threshold} ${node.statutes.map(s => s.code + " " + s.text).join(" ")} ${(node.cases || []).join(" ")}`.toLowerCase();
+          if (blob.includes(q)) {
+            matches.push({ scId: sc.id, scCode: sc.code, nodeId, title: node.title, threshold: node.threshold });
+          }
+        });
+      });
+
+      if (matches.length === 0) {
+        searchResults.innerHTML = `<div class="p-3 text-xs font-mono text-slate-400">No matching nodes or statutes found.</div>`;
+      } else {
+        searchResults.innerHTML = matches.slice(0, 10).map(m => `
+          <button onclick="selectScenario('${m.scId}', '${m.nodeId}'); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('globalSearch').value='';"
+            class="w-full text-left p-2.5 hover:bg-tac-hover transition block">
+            <div class="text-[10px] font-mono text-sky-400">${m.scCode} • ${m.threshold}</div>
+            <div class="text-xs font-semibold text-white">${m.title}</div>
+          </button>
+        `).join("");
+      }
+      searchResults.classList.remove("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.add("hidden");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        ['charterModal', 'groundsModal', 'caseIndexModal', 'exportModal'].forEach(closeModal);
+      }
+    });
+
+    // Boot
+    renderAll();
+  </script>
+</body>
+</html>
