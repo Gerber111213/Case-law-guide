@@ -46,12 +46,15 @@
     }
   </style>
 </head>
-<body class="bg-tac-bg text-slate-200 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 h-screen flex flex-col overflow-hidden">
+<body class="bg-tac-bg text-slate-200 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 min-h-screen lg:h-screen flex flex-col lg:overflow-hidden">
 
   <!-- TOP COMMAND BAR -->
-  <header class="h-14 bg-tac-panel border-b border-tac-border px-4 flex items-center justify-between shrink-0 z-20">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sky-400 font-mono font-bold text-sm">
+  <header class="min-h-14 bg-tac-panel border-b border-tac-border px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0 z-30">
+    <div class="flex items-center gap-2.5">
+      <button type="button" onclick="toggleDrawer('modules')" class="lg:hidden px-2 py-1.5 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-sky-400" aria-label="Toggle Modules">
+        ☰ MODULES
+      </button>
+      <div class="w-8 h-8 rounded bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sky-400 font-mono font-bold text-sm shrink-0">
         §
       </div>
       <div>
@@ -59,38 +62,54 @@
           <h1 class="font-bold tracking-wider text-sm uppercase text-white">LEX-OPS <span class="text-sky-400 font-mono">//</span> DECISION ENGINE</h1>
           <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30">CANADIAN FED + AB PROV</span>
         </div>
-        <p class="text-[11px] text-slate-400 hidden md:block">Operational Encounter Flowcharts, Statutory Authorities &amp; Charter Jurisprudence</p>
+        <p class="text-[11px] text-slate-400 hidden xl:block">Operational Encounter Flowcharts, Statutory Authorities &amp; Charter Jurisprudence</p>
       </div>
     </div>
 
     <!-- GLOBAL SEARCH & QUICK TOOLS -->
-    <div class="flex items-center gap-2">
-      <div class="relative hidden lg:block w-72">
-        <input id="globalSearch" type="text" placeholder="Search case law, section, node (e.g. Feeney, 495, MAS)..."
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+      <div class="relative hidden md:block w-60 xl:w-72">
+        <input id="globalSearch" type="text" placeholder="Search case, section, node (Feeney, 495, MAS)..."
           class="w-full bg-tac-bg border border-tac-border rounded px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-400 font-mono" />
         <div id="searchResults" class="hidden absolute left-0 right-0 mt-1 bg-tac-card border border-tac-border rounded-md shadow-2xl max-h-80 overflow-y-auto z-50 divide-y divide-tac-border"></div>
       </div>
 
-      <button onclick="openModal('charterModal')" class="px-2.5 py-1.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+      <button type="button" onclick="openModal('charterModal')" class="px-2.5 py-1.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
         <span>⚖</span> <span class="hidden sm:inline">CHARTER READOUTS</span>
       </button>
-      <button onclick="openModal('groundsModal')" class="px-2.5 py-1.5 rounded bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+      <button type="button" onclick="openModal('groundsModal')" class="px-2.5 py-1.5 rounded bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
         <span>📶</span> <span class="hidden sm:inline">GROUNDS LADDER</span>
       </button>
-      <button onclick="openModal('caseIndexModal')" class="px-2.5 py-1.5 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
+      <button type="button" onclick="openModal('caseIndexModal')" class="px-2.5 py-1.5 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/40 text-sky-300 text-xs font-mono font-semibold transition flex items-center gap-1.5">
         <span>📚</span> <span class="hidden sm:inline">CASE INDEX</span>
+      </button>
+      <button type="button" onclick="toggleDrawer('inspector')" class="lg:hidden px-2.5 py-1.5 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-semibold transition">
+        AUTHORITY
       </button>
     </div>
   </header>
 
-  <!-- MAIN 3-COLUMN WORKSPACE -->
-  <div class="flex-1 flex overflow-hidden">
+  <!-- MOBILE / TABLET SEARCH BAR -->
+  <div class="md:hidden bg-tac-panel border-b border-tac-border px-3 py-2 relative z-20">
+    <input id="mobileSearch" type="text" placeholder="Search case law, section, node..."
+      class="w-full bg-tac-bg border border-tac-border rounded px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-400 font-mono" />
+    <div id="mobileSearchResults" class="hidden absolute left-3 right-3 mt-1 bg-tac-card border border-tac-border rounded-md shadow-2xl max-h-72 overflow-y-auto z-50 divide-y divide-tac-border"></div>
+  </div>
+
+  <!-- DRAWER BACKDROP FOR < LG -->
+  <div id="drawerBackdrop" onclick="closeAllDrawers()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-xs z-30 lg:hidden"></div>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden relative">
 
     <!-- LEFT SIDEBAR: SCENARIO MODULES -->
-    <aside class="w-72 bg-tac-panel border-r border-tac-border flex flex-col shrink-0 overflow-hidden">
+    <aside id="modulesDrawer" class="hidden lg:flex fixed lg:static inset-y-0 left-0 w-80 lg:w-72 bg-tac-panel border-r border-tac-border flex-col shrink-0 lg:overflow-hidden z-40 shadow-2xl lg:shadow-none">
       <div class="p-3 border-b border-tac-border flex items-center justify-between">
         <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Encounter Modules</span>
-        <span id="scenarioCount" class="text-[10px] font-mono bg-tac-card px-1.5 py-0.5 rounded text-slate-400 border border-tac-border">6 TREES</span>
+        <div class="flex items-center gap-2">
+          <span id="scenarioCount" class="text-[10px] font-mono bg-tac-card px-1.5 py-0.5 rounded text-slate-400 border border-tac-border">6 MODULES</span>
+          <button type="button" onclick="closeAllDrawers()" class="lg:hidden text-xs font-mono text-slate-400 hover:text-white">✕</button>
+        </div>
       </div>
       <div id="moduleList" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
       <div class="p-3 border-t border-tac-border bg-tac-bg/60 text-[10px] text-slate-500 leading-relaxed">
@@ -99,41 +118,45 @@
     </aside>
 
     <!-- CENTER CANVAS: ACTIVE DECISION ENGINE -->
-    <main class="flex-1 flex flex-col overflow-hidden grid-bg relative">
-      <!-- BREADCRUMB & ARTICULATION BAR -->
-      <div class="bg-tac-panel/90 backdrop-blur border-b border-tac-border px-4 py-2.5 flex items-center justify-between gap-2 shrink-0">
-        <div id="breadcrumbTrail" class="flex items-center gap-1.5 overflow-x-auto text-xs font-mono whitespace-nowrap py-0.5"></div>
-        <div class="flex items-center gap-2 shrink-0">
-          <button onclick="stepBack()" id="btnBack" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 disabled:opacity-40 transition">
+    <main class="flex-1 flex flex-col lg:overflow-hidden grid-bg relative min-w-0">
+      <!-- BREADCRUMB & ACTION BAR -->
+      <div class="bg-tac-panel/90 backdrop-blur border-b border-tac-border px-3 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span id="stepCounter" class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-tac-card text-sky-400 border border-tac-border shrink-0">STEP 1</span>
+          <div id="breadcrumbTrail" class="flex items-center gap-1.5 overflow-x-auto text-xs font-mono whitespace-nowrap py-0.5"></div>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button type="button" onclick="stepBack()" id="btnBack" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 disabled:opacity-40 transition">
             ← BACK
           </button>
-          <button onclick="resetScenario()" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 transition">
+          <button type="button" onclick="resetScenario()" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 transition">
             ↺ RESTART
           </button>
-          <button onclick="openExportModal()" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-semibold transition">
-            📋 EXPORT NOTES
+          <button type="button" onclick="openExportModal()" class="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-semibold transition">
+            📋 EXPORT
           </button>
         </div>
       </div>
 
       <!-- DECISION NODE VIEWPORT -->
-      <div id="nodeViewport" class="flex-1 overflow-y-auto p-5 md:p-8 max-w-4xl w-full mx-auto space-y-6">
+      <div id="nodeViewport" class="flex-1 lg:overflow-y-auto p-4 sm:p-6 md:p-8 max-w-4xl w-full mx-auto space-y-6">
         <!-- Populated dynamically -->
       </div>
     </main>
 
     <!-- RIGHT INSPECTOR: STATUTES, CASE LAW & CHARTER TRAPS -->
-    <aside class="w-96 xl:w-[430px] bg-tac-panel border-l border-tac-border flex flex-col shrink-0 overflow-hidden">
-      <div class="flex border-b border-tac-border bg-tac-bg/50 shrink-0">
-        <button onclick="switchInspectorTab('statutes')" id="tab-statutes" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition">
+    <aside id="inspectorDrawer" class="hidden lg:flex fixed lg:static inset-y-0 right-0 w-full max-w-md lg:max-w-none lg:w-96 xl:w-[430px] bg-tac-panel border-l border-tac-border flex-col shrink-0 lg:overflow-hidden z-40 shadow-2xl lg:shadow-none">
+      <div class="flex items-center border-b border-tac-border bg-tac-bg/50 shrink-0">
+        <button type="button" onclick="switchInspectorTab('statutes')" id="tab-statutes" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition">
           STATUTES
         </button>
-        <button onclick="switchInspectorTab('caselaw')" id="tab-caselaw" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+        <button type="button" onclick="switchInspectorTab('caselaw')" id="tab-caselaw" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
           CASE LAW
         </button>
-        <button onclick="switchInspectorTab('articulation')" id="tab-articulation" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+        <button type="button" onclick="switchInspectorTab('articulation')" id="tab-articulation" class="flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
           NOTES &amp; TRAPS
         </button>
+        <button type="button" onclick="closeAllDrawers()" class="lg:hidden px-3 py-2.5 text-xs font-mono text-slate-400 hover:text-white border-l border-tac-border">✕</button>
       </div>
       <div id="inspectorContent" class="flex-1 overflow-y-auto p-4 space-y-4">
         <!-- Populated dynamically -->
@@ -147,7 +170,7 @@
     <div class="bg-tac-panel border border-tac-border rounded-lg max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-tac-border flex items-center justify-between">
         <h2 class="font-mono font-bold text-sm text-amber-400 uppercase">⚖ Mandatory Charter Cautions &amp; Demand Readouts</h2>
-        <button onclick="closeModal('charterModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+        <button type="button" onclick="closeModal('charterModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
       </div>
       <div class="p-5 overflow-y-auto space-y-4 text-xs leading-relaxed">
         <div class="bg-tac-card border border-tac-border rounded p-3.5">
@@ -190,7 +213,7 @@
     <div class="bg-tac-panel border border-tac-border rounded-lg max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-tac-border flex items-center justify-between">
         <h2 class="font-mono font-bold text-sm text-purple-400 uppercase">📶 Canadian Legal Thresholds &amp; Grounds Ladder</h2>
-        <button onclick="closeModal('groundsModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+        <button type="button" onclick="closeModal('groundsModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
       </div>
       <div class="p-5 overflow-y-auto space-y-3 text-xs">
         <div class="p-3 rounded bg-slate-800/60 border border-slate-700">
@@ -220,10 +243,12 @@
   <!-- MODAL: CASE LAW INDEX -->
   <div id="caseIndexModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-tac-panel border border-tac-border rounded-lg max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl">
-      <div class="p-4 border-b border-tac-border flex items-center justify-between gap-4">
-        <h2 class="font-mono font-bold text-sm text-sky-400 uppercase shrink-0">📚 Supreme Court &amp; Appellate Precedent Library</h2>
-        <input id="caseFilterInput" type="text" placeholder="Filter cases..." class="bg-tac-bg border border-tac-border rounded px-3 py-1 text-xs font-mono text-slate-200 w-64 focus:outline-none focus:border-sky-400">
-        <button onclick="closeModal('caseIndexModal')" class="text-slate-400 hover:text-white font-mono text-sm shrink-0">✕ ESC</button>
+      <div class="p-4 border-b border-tac-border flex flex-wrap items-center justify-between gap-3">
+        <h2 class="font-mono font-bold text-sm text-sky-400 uppercase">📚 Supreme Court &amp; Appellate Precedent Library</h2>
+        <div class="flex items-center gap-3">
+          <input id="caseFilterInput" type="text" placeholder="Filter cases..." class="bg-tac-bg border border-tac-border rounded px-3 py-1 text-xs font-mono text-slate-200 w-48 sm:w-64 focus:outline-none focus:border-sky-400">
+          <button type="button" onclick="closeModal('caseIndexModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+        </div>
       </div>
       <div id="caseIndexList" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
     </div>
@@ -234,13 +259,13 @@
     <div class="bg-tac-panel border border-tac-border rounded-lg max-w-2xl w-full flex flex-col shadow-2xl">
       <div class="p-4 border-b border-tac-border flex items-center justify-between">
         <h2 class="font-mono font-bold text-sm text-emerald-400 uppercase">📋 Decision Path &amp; Statutory Articulation Log</h2>
-        <button onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
+        <button type="button" onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
       </div>
       <div class="p-4 space-y-3">
         <p class="text-xs text-slate-400">Generated summary of your decision path, legal thresholds, and governing authorities for study notes or report structuring:</p>
         <textarea id="exportTextarea" rows="14" readonly class="w-full bg-tac-bg border border-tac-border rounded p-3 font-mono text-xs text-slate-200 focus:outline-none"></textarea>
         <div class="flex justify-end gap-2">
-          <button onclick="copyExportText()" id="copyBtn" class="px-4 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-xs transition">
+          <button type="button" onclick="copyExportText()" id="copyBtn" class="px-4 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-xs transition">
             COPY TO CLIPBOARD
           </button>
         </div>
@@ -249,9 +274,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // 1. MASTER JURISPRUDENCE LIBRARY
-    // =========================================================================
     const CASE_LIBRARY = {
       ladouceur: {
         title: "R. v. Ladouceur, [1990] 1 S.C.R. 1257",
@@ -345,9 +367,6 @@
       }
     };
 
-    // =========================================================================
-    // 2. COMPLETE ENCOUNTER DECISION TREES
-    // =========================================================================
     const SCENARIOS = [
       {
         id: "traffic_stop",
@@ -1390,14 +1409,7 @@
       }
     ];
 
-    // =========================================================================
-    // 3. APPLICATION STATE & ENGINE
-    // =========================================================================
-    let state = {
-      scenarioId: "traffic_stop",
-      history: ["ts_start"],
-      inspectorTab: "statutes"
-    };
+    const STORAGE_KEY = "lexops_state_v1";
 
     const thresholdBadgeStyles = {
       emerald: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
@@ -1407,21 +1419,92 @@
       purple: "bg-purple-500/15 text-purple-300 border-purple-500/40"
     };
 
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { scenarioId: "traffic_stop", history: ["ts_start"], inspectorTab: "statutes" };
+        const parsed = JSON.parse(raw);
+        const sc = SCENARIOS.find(s => s.id === parsed.scenarioId) || SCENARIOS[0];
+        const validHistory = Array.isArray(parsed.history) && parsed.history.length > 0 && parsed.history.every(id => Boolean(sc.nodes[id]))
+          ? parsed.history
+          : [sc.startNode];
+        const validTab = ["statutes", "caselaw", "articulation"].includes(parsed.inspectorTab) ? parsed.inspectorTab : "statutes";
+        return { scenarioId: sc.id, history: validHistory, inspectorTab: validTab };
+      } catch {
+        return { scenarioId: "traffic_stop", history: ["ts_start"], inspectorTab: "statutes" };
+      }
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {
+        // Ignore storage quota or private mode errors
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
     function getCurrentScenario() {
-      return SCENARIOS.find(s => s.id === state.scenarioId);
+      return SCENARIOS.find(s => s.id === state.scenarioId) || SCENARIOS[0];
     }
 
     function getCurrentNode() {
       const scenario = getCurrentScenario();
       const nodeId = state.history[state.history.length - 1];
-      return { id: nodeId, data: scenario.nodes[nodeId] };
+      return { id: nodeId, data: scenario.nodes[nodeId] || scenario.nodes[scenario.startNode] };
+    }
+
+    function toggleDrawer(which) {
+      const backdrop = document.getElementById("drawerBackdrop");
+      const modules = document.getElementById("modulesDrawer");
+      const inspector = document.getElementById("inspectorDrawer");
+
+      if (which === "modules") {
+        const willOpen = modules.classList.contains("hidden");
+        closeAllDrawers();
+        if (willOpen) {
+          modules.classList.remove("hidden");
+          modules.classList.add("flex");
+          backdrop.classList.remove("hidden");
+        }
+      } else if (which === "inspector") {
+        const willOpen = inspector.classList.contains("hidden");
+        closeAllDrawers();
+        if (willOpen) {
+          inspector.classList.remove("hidden");
+          inspector.classList.add("flex");
+          backdrop.classList.remove("hidden");
+        }
+      }
+    }
+
+    function closeAllDrawers() {
+      document.getElementById("drawerBackdrop").classList.add("hidden");
+      const modules = document.getElementById("modulesDrawer");
+      const inspector = document.getElementById("inspectorDrawer");
+      modules.classList.add("hidden");
+      modules.classList.remove("flex");
+      inspector.classList.add("hidden");
+      inspector.classList.remove("flex");
     }
 
     function selectScenario(id, targetNodeId = null) {
       const sc = SCENARIOS.find(s => s.id === id);
       if (!sc) return;
-      state.scenarioId = id;
-      state.history = [targetNodeId || sc.startNode];
+      state.scenarioId = sc.id;
+      state.history = [targetNodeId && sc.nodes[targetNodeId] ? targetNodeId : sc.startNode];
+      saveState();
+      closeAllDrawers();
       renderAll();
     }
 
@@ -1429,12 +1512,15 @@
       const sc = getCurrentScenario();
       if (!sc.nodes[nextNodeId]) return;
       state.history.push(nextNodeId);
+      saveState();
       renderAll();
+      document.getElementById("nodeViewport").scrollTop = 0;
     }
 
     function stepBack() {
       if (state.history.length > 1) {
         state.history.pop();
+        saveState();
         renderAll();
       }
     }
@@ -1442,48 +1528,46 @@
     function resetScenario() {
       const sc = getCurrentScenario();
       state.history = [sc.startNode];
+      saveState();
       renderAll();
     }
 
     function jumpToHistory(index) {
       state.history = state.history.slice(0, index + 1);
+      saveState();
       renderAll();
     }
 
     function switchInspectorTab(tab) {
       state.inspectorTab = tab;
-      ['statutes', 'caselaw', 'articulation'].forEach(t => {
+      saveState();
+      ["statutes", "caselaw", "articulation"].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
-        if (t === tab) {
-          el.className = "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition";
-        } else {
-          el.className = "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
-        }
+        el.className = t === tab
+          ? "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-sky-400 text-sky-400 transition"
+          : "flex-1 py-2.5 text-xs font-mono font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
       });
       renderInspector();
     }
 
-    // =========================================================================
-    // 4. RENDER FUNCTIONS
-    // =========================================================================
     function renderModuleList() {
       const container = document.getElementById("moduleList");
       document.getElementById("scenarioCount").textContent = `${SCENARIOS.length} MODULES`;
       container.innerHTML = SCENARIOS.map(sc => {
         const active = sc.id === state.scenarioId;
         return `
-          <button onclick="selectScenario('${sc.id}')"
+          <button type="button" onclick="selectScenario('${escapeHtml(sc.id)}')"
             class="w-full text-left p-3 rounded-md border transition ${
               active
                 ? 'bg-sky-500/10 border-sky-500/50 shadow-sm'
                 : 'bg-tac-card/60 border-tac-border hover:bg-tac-hover hover:border-slate-600'
             }">
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-mono font-bold ${active ? 'text-sky-400' : 'text-slate-400'}">${sc.code}</span>
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-tac-bg text-slate-300 border border-tac-border">${sc.badge}</span>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[10px] font-mono font-bold ${active ? 'text-sky-400' : 'text-slate-400'}">${escapeHtml(sc.code)}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-tac-bg text-slate-300 border border-tac-border truncate">${escapeHtml(sc.badge)}</span>
             </div>
-            <div class="text-xs font-bold ${active ? 'text-white' : 'text-slate-200'}">${sc.title}</div>
-            <div class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${sc.subtitle}</div>
+            <div class="text-xs font-bold ${active ? 'text-white' : 'text-slate-200'}">${escapeHtml(sc.title)}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">${escapeHtml(sc.subtitle)}</div>
           </button>
         `;
       }).join("");
@@ -1493,22 +1577,63 @@
       const sc = getCurrentScenario();
       const trail = document.getElementById("breadcrumbTrail");
       document.getElementById("btnBack").disabled = state.history.length <= 1;
+      document.getElementById("stepCounter").textContent = `STEP ${state.history.length}`;
 
       trail.innerHTML = state.history.map((nodeId, idx) => {
         const node = sc.nodes[nodeId];
+        if (!node) return "";
         const isLast = idx === state.history.length - 1;
         return `
-          <button onclick="jumpToHistory(${idx})"
+          <button type="button" onclick="jumpToHistory(${idx})"
             class="px-2 py-0.5 rounded transition ${
               isLast
                 ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-semibold'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-tac-card'
             }">
-            ${idx + 1}. ${node.title.split(':')[0]}
+            ${idx + 1}. ${escapeHtml(node.title.split(':')[0])}
           </button>
           ${!isLast ? '<span class="text-slate-600">→</span>' : ''}
         `;
       }).join("");
+
+      trail.scrollLeft = trail.scrollWidth;
+    }
+
+    function buildTerminalRecapHtml(sc) {
+      const steps = state.history.map((nodeId, idx) => {
+        const n = sc.nodes[nodeId];
+        return `
+          <div class="p-2.5 rounded bg-tac-bg/80 border border-tac-border text-xs space-y-1">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="font-mono font-bold text-slate-200">${idx + 1}. ${escapeHtml(n.title)}</span>
+              <span class="font-mono text-[10px] text-sky-400">${escapeHtml(n.threshold)}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono">${escapeHtml(n.statutes.map(s => s.code).join(" • "))}</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="p-4 sm:p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div class="font-mono text-xs font-bold text-emerald-400 uppercase">✓ Encounter Path Summary (${state.history.length} Steps)</div>
+              <p class="text-xs text-slate-300 mt-0.5">Review your traversed steps below or export a formatted articulation log.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openExportModal()" class="px-3 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono text-xs font-bold transition">
+                📋 FULL LOG
+              </button>
+              <button type="button" onclick="resetScenario()" class="px-3 py-1.5 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-slate-200 font-mono text-xs font-semibold transition">
+                ↺ RESTART
+              </button>
+            </div>
+          </div>
+          <div class="space-y-2">
+            ${steps}
+          </div>
+        </div>
+      `;
     }
 
     function renderCenterNode() {
@@ -1520,49 +1645,39 @@
       const guidanceHtml = node.operationalGuidance.map(item => `
         <li class="flex items-start gap-2.5 text-sm text-slate-200">
           <span class="text-sky-400 font-mono font-bold mt-0.5">▸</span>
-          <span>${item}</span>
+          <span>${escapeHtml(item)}</span>
         </li>
       `).join("");
 
       const choicesHtml = node.choices.length > 0
         ? node.choices.map((ch, idx) => `
-            <button onclick="chooseBranch('${ch.next}')"
+            <button type="button" onclick="chooseBranch('${escapeHtml(ch.next)}')"
               class="w-full text-left p-3.5 rounded-lg bg-tac-card hover:bg-tac-hover border border-tac-border hover:border-sky-400/60 transition group flex items-center justify-between gap-3">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 min-w-0">
                 <span class="w-6 h-6 rounded bg-tac-bg border border-tac-border group-hover:border-sky-400 group-hover:text-sky-400 font-mono text-xs flex items-center justify-center text-slate-400 shrink-0">
                   ${String.fromCharCode(65 + idx)}
                 </span>
-                <span class="text-sm font-medium text-slate-100 group-hover:text-white">${ch.label}</span>
+                <span class="text-sm font-medium text-slate-100 group-hover:text-white">${escapeHtml(ch.label)}</span>
               </div>
               <span class="font-mono text-xs text-slate-500 group-hover:text-sky-400 shrink-0">PROCEED →</span>
             </button>
           `).join("")
-        : `
-          <div class="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
-            <div>
-              <div class="font-mono text-xs font-bold text-emerald-400 uppercase">✓ Encounter Branch Terminal Node</div>
-              <p class="text-xs text-slate-300 mt-0.5">Review statutory authorities and export your articulation notes in the top bar.</p>
-            </div>
-            <button onclick="resetScenario()" class="px-3 py-1.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-semibold">
-              ↺ RESTART MODULE
-            </button>
-          </div>
-        `;
+        : buildTerminalRecapHtml(sc);
 
       viewport.innerHTML = `
-        <div class="bg-tac-panel border border-tac-border rounded-xl p-6 shadow-xl space-y-5">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-tac-border pb-4">
+        <div class="bg-tac-panel border border-tac-border rounded-xl p-4 sm:p-6 shadow-xl space-y-5">
+          <div class="flex flex-wrap items-start justify-between gap-3 border-b border-tac-border pb-4">
             <div>
-              <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">${sc.code} // ${sc.title}</div>
-              <h2 class="text-xl font-bold text-white mt-1">${node.title}</h2>
+              <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">${escapeHtml(sc.code)} // ${escapeHtml(sc.title)}</div>
+              <h2 class="text-lg sm:text-xl font-bold text-white mt-1">${escapeHtml(node.title)}</h2>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-mono font-bold border ${badgeStyle}">
-              ${node.threshold}
+              ${escapeHtml(node.threshold)}
             </span>
           </div>
 
           <div class="bg-tac-bg/80 border border-tac-border rounded-lg p-4 text-sm text-slate-200 leading-relaxed">
-            ${node.prompt}
+            ${escapeHtml(node.prompt)}
           </div>
 
           <div>
@@ -1573,7 +1688,9 @@
           </div>
 
           <div class="pt-2 border-t border-tac-border">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-sky-400 font-semibold mb-3">Select Next Operational Decision</h3>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-sky-400 font-semibold mb-3">
+              ${node.choices.length > 0 ? "Select Next Operational Decision" : "Encounter Recap & Next Steps"}
+            </h3>
             <div class="space-y-2.5">
               ${choicesHtml}
             </div>
@@ -1591,14 +1708,14 @@
           <div class="text-[11px] font-mono uppercase text-slate-400">Governing Statutory &amp; Common Law Authority</div>
           ${node.statutes.map(st => `
             <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-1.5">
-              <div class="font-mono text-xs font-bold text-sky-400">${st.code}</div>
-              <p class="text-xs text-slate-300 leading-relaxed">${st.text}</p>
+              <div class="font-mono text-xs font-bold text-sky-400">${escapeHtml(st.code)}</div>
+              <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(st.text)}</p>
             </div>
           `).join("")}
         `;
       } else if (state.inspectorTab === "caselaw") {
         if (!node.cases || node.cases.length === 0) {
-          container.innerHTML = `<div class="text-xs text-slate-400 font-mono">No specific appellate cases tagged to this terminal step.</div>`;
+          container.innerHTML = `<div class="text-xs text-slate-400 font-mono">No specific appellate cases tagged to this step.</div>`;
           return;
         }
         container.innerHTML = `
@@ -1608,11 +1725,9 @@
             if (!c) return "";
             return `
               <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-1.5">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="font-mono text-xs font-bold text-amber-400">${c.title}</span>
-                </div>
-                <div class="text-[10px] font-mono uppercase text-sky-400">${c.topic}</div>
-                <p class="text-xs text-slate-300 leading-relaxed">${c.holding}</p>
+                <div class="font-mono text-xs font-bold text-amber-400">${escapeHtml(c.title)}</div>
+                <div class="text-[10px] font-mono uppercase text-sky-400">${escapeHtml(c.topic)}</div>
+                <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(c.holding)}</p>
               </div>
             `;
           }).join("")}
@@ -1621,7 +1736,7 @@
         const notesHtml = node.articulation.map(n => `
           <li class="flex items-start gap-2 text-xs text-slate-200">
             <span class="text-emerald-400 font-mono font-bold">✓</span>
-            <span>${n}</span>
+            <span>${escapeHtml(n)}</span>
           </li>
         `).join("");
 
@@ -1629,7 +1744,7 @@
           ? node.traps.map(t => `
               <div class="p-3 rounded-lg bg-red-950/30 border border-red-500/40 text-xs text-red-200 leading-relaxed">
                 <span class="font-mono font-bold text-red-400 block mb-1">⚠ CHARTER / s. 24(2) EXCLUSION TRAP</span>
-                ${t}
+                ${escapeHtml(t)}
               </div>
             `).join("")
           : `<div class="text-xs text-slate-400 font-mono">No specific Charter traps flagged at this step.</div>`;
@@ -1660,12 +1775,9 @@
       renderInspector();
     }
 
-    // =========================================================================
-    // 5. SEARCH, MODALS & EXPORT LOG
-    // =========================================================================
     function openModal(id) {
       document.getElementById(id).classList.remove("hidden");
-      if (id === "caseIndexModal") renderCaseIndex();
+      if (id === "caseIndexModal") renderCaseIndex(document.getElementById("caseFilterInput").value);
     }
 
     function closeModal(id) {
@@ -1674,17 +1786,22 @@
 
     function renderCaseIndex(filter = "") {
       const list = document.getElementById("caseIndexList");
-      const q = filter.toLowerCase();
+      const q = filter.trim().toLowerCase();
       const entries = Object.values(CASE_LIBRARY).filter(c =>
+        !q ||
         c.title.toLowerCase().includes(q) ||
         c.topic.toLowerCase().includes(q) ||
         c.holding.toLowerCase().includes(q)
       );
+      if (entries.length === 0) {
+        list.innerHTML = `<div class="col-span-full text-xs font-mono text-slate-400">No matching cases found.</div>`;
+        return;
+      }
       list.innerHTML = entries.map(c => `
         <div class="p-3.5 rounded bg-tac-card border border-tac-border space-y-1">
-          <div class="font-mono font-bold text-amber-400">${c.title}</div>
-          <div class="text-[10px] font-mono uppercase text-sky-400">${c.topic}</div>
-          <p class="text-slate-300 leading-relaxed pt-1">${c.holding}</p>
+          <div class="font-mono font-bold text-amber-400">${escapeHtml(c.title)}</div>
+          <div class="text-[10px] font-mono uppercase text-sky-400">${escapeHtml(c.topic)}</div>
+          <p class="text-slate-300 leading-relaxed pt-1">${escapeHtml(c.holding)}</p>
         </div>
       `).join("");
     }
@@ -1696,87 +1813,122 @@
     function openExportModal() {
       const sc = getCurrentScenario();
       const lines = [
-        `LEX-OPS // ENCOUNTER DECISION & AUTHORITY LOG`,
+        "LEX-OPS // ENCOUNTER DECISION & AUTHORITY LOG",
         `MODULE: ${sc.code} - ${sc.title}`,
         `GENERATED: ${new Date().toLocaleString()}`,
-        `============================================================`,
-        ``
+        "============================================================",
+        ""
       ];
 
       state.history.forEach((nodeId, idx) => {
         const n = sc.nodes[nodeId];
+        if (!n) return;
         lines.push(`STEP ${idx + 1}: ${n.title}`);
         lines.push(`LEGAL THRESHOLD: ${n.threshold}`);
         lines.push(`STATUTES: ${n.statutes.map(s => s.code).join(" | ")}`);
         if (n.cases && n.cases.length) {
-          lines.push(`CASE LAW: ${n.cases.map(k => CASE_LIBRARY[k]?.title).join(" | ")}`);
+          lines.push(`CASE LAW: ${n.cases.map(k => CASE_LIBRARY[k]?.title).filter(Boolean).join(" | ")}`);
         }
-        lines.push(`ARTICULATION CHECKLIST:`);
+        lines.push("ARTICULATION CHECKLIST:");
         n.articulation.forEach(a => lines.push(`  - ${a}`));
-        lines.push(`------------------------------------------------------------`);
+        lines.push("------------------------------------------------------------");
       });
 
       document.getElementById("exportTextarea").value = lines.join("\n");
       openModal("exportModal");
     }
 
-    function copyExportText() {
+    async function copyExportText() {
       const ta = document.getElementById("exportTextarea");
-      ta.select();
-      navigator.clipboard.writeText(ta.value);
       const btn = document.getElementById("copyBtn");
+      try {
+        await navigator.clipboard.writeText(ta.value);
+      } catch {
+        ta.select();
+        document.execCommand("copy");
+      }
       btn.textContent = "✓ COPIED";
       setTimeout(() => (btn.textContent = "COPY TO CLIPBOARD"), 1500);
     }
 
-    // Global Search
-    const searchInput = document.getElementById("globalSearch");
-    const searchResults = document.getElementById("searchResults");
+    function bindSearch(inputEl, resultsEl) {
+      inputEl.addEventListener("input", (e) => {
+        const q = e.target.value.trim().toLowerCase();
+        if (!q) {
+          resultsEl.classList.add("hidden");
+          resultsEl.innerHTML = "";
+          return;
+        }
 
-    searchInput.addEventListener("input", (e) => {
-      const q = e.target.value.trim().toLowerCase();
-      if (!q) {
-        searchResults.classList.add("hidden");
-        return;
-      }
+        const matches = [];
+        SCENARIOS.forEach(sc => {
+          Object.entries(sc.nodes).forEach(([nodeId, node]) => {
+            const caseTitles = (node.cases || []).map(k => CASE_LIBRARY[k]?.title || k).join(" ");
+            const statuteText = node.statutes.map(s => `${s.code} ${s.text}`).join(" ");
+            const matchedIn = [];
+            if (`${node.title} ${node.prompt} ${node.threshold}`.toLowerCase().includes(q)) matchedIn.push("NODE");
+            if (statuteText.toLowerCase().includes(q)) matchedIn.push("STATUTE");
+            if (caseTitles.toLowerCase().includes(q)) matchedIn.push("CASE");
 
-      const matches = [];
-      SCENARIOS.forEach(sc => {
-        Object.entries(sc.nodes).forEach(([nodeId, node]) => {
-          const blob = `${node.title} ${node.prompt} ${node.threshold} ${node.statutes.map(s => s.code + " " + s.text).join(" ")} ${(node.cases || []).join(" ")}`.toLowerCase();
-          if (blob.includes(q)) {
-            matches.push({ scId: sc.id, scCode: sc.code, nodeId, title: node.title, threshold: node.threshold });
-          }
+            if (matchedIn.length > 0) {
+              matches.push({
+                scId: sc.id,
+                scCode: sc.code,
+                nodeId,
+                title: node.title,
+                threshold: node.threshold,
+                matchedIn: matchedIn.join("+")
+              });
+            }
+          });
         });
+
+        if (matches.length === 0) {
+          resultsEl.innerHTML = `<div class="p-3 text-xs font-mono text-slate-400">No matching nodes, statutes, or cases found.</div>`;
+        } else {
+          const shown = matches.slice(0, 12);
+          const extraNote = matches.length > shown.length
+            ? `<div class="px-2.5 py-1.5 text-[10px] font-mono text-slate-400 bg-tac-bg/70">Showing ${shown.length} of ${matches.length} matches</div>`
+            : "";
+          resultsEl.innerHTML = shown.map(m => `
+            <button type="button" data-sc="${escapeHtml(m.scId)}" data-node="${escapeHtml(m.nodeId)}"
+              class="search-hit w-full text-left p-2.5 hover:bg-tac-hover transition block">
+              <div class="flex items-center justify-between gap-2 text-[10px] font-mono text-sky-400">
+                <span>${escapeHtml(m.scCode)} • ${escapeHtml(m.matchedIn)}</span>
+                <span class="text-slate-400 truncate">${escapeHtml(m.threshold)}</span>
+              </div>
+              <div class="text-xs font-semibold text-white mt-0.5">${escapeHtml(m.title)}</div>
+            </button>
+          `).join("") + extraNote;
+
+          resultsEl.querySelectorAll(".search-hit").forEach(btn => {
+            btn.addEventListener("click", () => {
+              selectScenario(btn.dataset.sc, btn.dataset.node);
+              resultsEl.classList.add("hidden");
+              inputEl.value = "";
+            });
+          });
+        }
+        resultsEl.classList.remove("hidden");
       });
 
-      if (matches.length === 0) {
-        searchResults.innerHTML = `<div class="p-3 text-xs font-mono text-slate-400">No matching nodes or statutes found.</div>`;
-      } else {
-        searchResults.innerHTML = matches.slice(0, 10).map(m => `
-          <button onclick="selectScenario('${m.scId}', '${m.nodeId}'); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('globalSearch').value='';"
-            class="w-full text-left p-2.5 hover:bg-tac-hover transition block">
-            <div class="text-[10px] font-mono text-sky-400">${m.scCode} • ${m.threshold}</div>
-            <div class="text-xs font-semibold text-white">${m.title}</div>
-          </button>
-        `).join("");
-      }
-      searchResults.classList.remove("hidden");
-    });
+      document.addEventListener("click", (e) => {
+        if (!inputEl.contains(e.target) && !resultsEl.contains(e.target)) {
+          resultsEl.classList.add("hidden");
+        }
+      });
+    }
 
-    document.addEventListener("click", (e) => {
-      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-        searchResults.classList.add("hidden");
-      }
-    });
+    bindSearch(document.getElementById("globalSearch"), document.getElementById("searchResults"));
+    bindSearch(document.getElementById("mobileSearch"), document.getElementById("mobileSearchResults"));
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        ['charterModal', 'groundsModal', 'caseIndexModal', 'exportModal'].forEach(closeModal);
+        ["charterModal", "groundsModal", "caseIndexModal", "exportModal"].forEach(closeModal);
+        closeAllDrawers();
       }
     });
 
-    // Boot
     renderAll();
   </script>
 </body>
