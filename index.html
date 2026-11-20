@@ -60,7 +60,7 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="font-bold tracking-wider text-sm uppercase text-white">LEX-OPS <span class="text-sky-400 font-mono">//</span> DECISION ENGINE</h1>
-          <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30">CANADIAN FED + AB PROV</span>
+          <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/30">CANADIAN FED + AB CPO</span>
         </div>
         <p class="text-[11px] text-slate-400 hidden xl:block">Operational Encounter Flowcharts, Statutory Authorities &amp; Charter Jurisprudence</p>
       </div>
@@ -69,7 +69,7 @@
     <!-- GLOBAL SEARCH & QUICK TOOLS -->
     <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
       <div class="relative hidden md:block w-60 xl:w-72">
-        <input id="globalSearch" type="text" placeholder="Search case, section, node (Feeney, 495, MAS)..."
+        <input id="globalSearch" type="text" placeholder="Search case, section, CPO... (press /)"
           class="w-full bg-tac-bg border border-tac-border rounded px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-400 font-mono" />
         <div id="searchResults" class="hidden absolute left-0 right-0 mt-1 bg-tac-card border border-tac-border rounded-md shadow-2xl max-h-80 overflow-y-auto z-50 divide-y divide-tac-border"></div>
       </div>
@@ -102,18 +102,28 @@
   <!-- MAIN WORKSPACE -->
   <div class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden relative">
 
-    <!-- LEFT SIDEBAR: SCENARIO MODULES -->
+    <!-- LEFT SIDEBAR: SCENARIO MODULES & BOOKMARKS -->
     <aside id="modulesDrawer" class="hidden lg:flex fixed lg:static inset-y-0 left-0 w-80 lg:w-72 bg-tac-panel border-r border-tac-border flex-col shrink-0 lg:overflow-hidden z-40 shadow-2xl lg:shadow-none">
       <div class="p-3 border-b border-tac-border flex items-center justify-between">
         <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Encounter Modules</span>
         <div class="flex items-center gap-2">
-          <span id="scenarioCount" class="text-[10px] font-mono bg-tac-card px-1.5 py-0.5 rounded text-slate-400 border border-tac-border">6 MODULES</span>
+          <span id="scenarioCount" class="text-[10px] font-mono bg-tac-card px-1.5 py-0.5 rounded text-slate-400 border border-tac-border">7 MODULES</span>
           <button type="button" onclick="closeAllDrawers()" class="lg:hidden text-xs font-mono text-slate-400 hover:text-white">✕</button>
         </div>
       </div>
-      <div id="moduleList" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
+      <div id="moduleList" class="overflow-y-auto p-2 space-y-1.5 shrink-0 max-h-[62vh] lg:max-h-[58%]"></div>
+
+      <!-- BOOKMARKED NODES -->
+      <div class="p-3 border-t border-tac-border flex-1 overflow-y-auto space-y-2 bg-tac-bg/30">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-semibold">★ Bookmarked Nodes</span>
+          <span id="bookmarkCount" class="text-[10px] font-mono text-slate-500">0</span>
+        </div>
+        <div id="bookmarkList" class="space-y-1.5 text-xs"></div>
+      </div>
+
       <div class="p-3 border-t border-tac-border bg-tac-bg/60 text-[10px] text-slate-500 leading-relaxed">
-        <strong class="text-slate-400">TRAINING &amp; REFERENCE AID:</strong> Verify current statutory amendments &amp; agency policy prior to operational deployment.
+        <strong class="text-slate-400">KEYS:</strong> <span class="font-mono text-slate-300">1–4</span> branch · <span class="font-mono text-slate-300">Backspace</span> back · <span class="font-mono text-slate-300">/</span> search. Verify current statutes &amp; appointment terms.
       </div>
     </aside>
 
@@ -126,6 +136,9 @@
           <div id="breadcrumbTrail" class="flex items-center gap-1.5 overflow-x-auto text-xs font-mono whitespace-nowrap py-0.5"></div>
         </div>
         <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <button type="button" onclick="toggleBookmarkCurrent()" id="btnBookmark" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-amber-300 transition" title="Bookmark current node">
+            ☆ SAVE
+          </button>
           <button type="button" onclick="stepBack()" id="btnBack" class="px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-slate-300 disabled:opacity-40 transition">
             ← BACK
           </button>
@@ -186,7 +199,7 @@
           </p>
         </div>
         <div class="bg-tac-card border border-tac-border rounded p-3.5">
-          <div class="font-mono font-bold text-amber-400 mb-1">3. PRIMARY POLICE CAUTION (Right to Silence — R. v. Hebert)</div>
+          <div class="font-mono font-bold text-amber-400 mb-1">3. PRIMARY POLICE CAUTION (Right to Silence — R. v. Hebert / R. v. Oickle)</div>
           <p class="text-slate-200 bg-tac-bg p-2.5 rounded border border-tac-border font-mono">
             "You are charged with / will be charged with [offence]. Do you wish to say anything in answer to the charge? You are not obliged to say anything unless you wish to do so, but whatever you say may be given in evidence."
           </p>
@@ -218,11 +231,11 @@
       <div class="p-5 overflow-y-auto space-y-3 text-xs">
         <div class="p-3 rounded bg-slate-800/60 border border-slate-700">
           <div class="font-mono font-bold text-slate-300">TIER 1: MERE HUNCH / CONSENSUAL INTERACTION (Zero Detention)</div>
-          <p class="text-slate-400 mt-1">Police may approach and ask questions in public spaces without grounds, provided a reasonable person would feel free to walk away (<em>R. v. Suberu</em>). Zero power to compel ID (outside licensed driving/regulatory duties) or search.</p>
+          <p class="text-slate-400 mt-1">Police/CPOs may approach and ask questions in public spaces without grounds, provided a reasonable person would feel free to walk away (<em>R. v. Suberu</em>). Zero power to compel ID outside specific statutory/regulatory duties or search.</p>
         </div>
         <div class="p-3 rounded bg-sky-950/50 border border-sky-700/50">
           <div class="font-mono font-bold text-sky-400">TIER 2: STATUTORY TRAFFIC STOP / MAS (TSA s. 166 / CCC s. 320.27(2))</div>
-          <p class="text-slate-300 mt-1">Random traffic stop authorized for highway safety regulation (<em>R. v. Ladouceur</em>). Permits demand for DL, registration, insurance, mechanical check, and forthwith ASD breath sample if device is immediately on hand. Cannot morph into a criminal fishing expedition without new grounds (<em>R. v. Mellenthin</em>).</p>
+          <p class="text-slate-300 mt-1">Random traffic stop authorized for highway safety regulation (<em>R. v. Ladouceur</em>). Permits demand for DL, registration, insurance, mechanical check, and forthwith ASD breath sample if authorized/equipped. Cannot morph into a criminal fishing expedition without new grounds (<em>R. v. Mellenthin</em>).</p>
         </div>
         <div class="p-3 rounded bg-amber-950/40 border border-amber-600/50">
           <div class="font-mono font-bold text-amber-400">TIER 3: REASONABLE SUSPICION (Articulable Cause — R. v. Mann / R. v. Chehil)</div>
@@ -262,8 +275,8 @@
         <button type="button" onclick="closeModal('exportModal')" class="text-slate-400 hover:text-white font-mono text-sm">✕ ESC</button>
       </div>
       <div class="p-4 space-y-3">
-        <p class="text-xs text-slate-400">Generated summary of your decision path, legal thresholds, and governing authorities for study notes or report structuring:</p>
-        <textarea id="exportTextarea" rows="14" readonly class="w-full bg-tac-bg border border-tac-border rounded p-3 font-mono text-xs text-slate-200 focus:outline-none"></textarea>
+        <p class="text-xs text-slate-400">Generated summary of your decision path, checked articulation points, custom field notes, and governing authorities:</p>
+        <textarea id="exportTextarea" rows="15" readonly class="w-full bg-tac-bg border border-tac-border rounded p-3 font-mono text-xs text-slate-200 focus:outline-none"></textarea>
         <div class="flex justify-end gap-2">
           <button type="button" onclick="copyExportText()" id="copyBtn" class="px-4 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-mono font-bold text-xs transition">
             COPY TO CLIPBOARD
@@ -364,6 +377,16 @@
         title: "R. v. Tim, 2022 SCC 12",
         topic: "Mistake of Law & Arrest Validity",
         holding: "An arrest based on a mistake of law (believing a non-existent offence exists) is unlawful under s. 9, though evidence may still be evaluated under s. 24(2) depending on good faith and seriousness of state conduct."
+      },
+      oickle: {
+        title: "R. v. Oickle, 2000 SCC 38",
+        topic: "Confessions & Voluntariness Rule",
+        holding: "Establishes the modern confessions rule: Crown must prove beyond a reasonable doubt that a statement to a person in authority was voluntary—free from threats/promises (quid pro quo), oppression, operating mind deficits, or police trickery that shocks the community."
+      },
+      singh: {
+        title: "R. v. Singh, 2007 SCC 48",
+        topic: "Right to Silence During Custodial Interrogation",
+        holding: "A detained or arrested suspect has the right to choose whether to speak, not a right to be free from repeated, non-coercive police questioning after declining to answer, provided voluntariness and s. 10(b) counsel rights are respected."
       }
     };
 
@@ -382,8 +405,8 @@
             thresholdColor: "sky",
             prompt: "You initiate a traffic stop (either a random check for licensing/insurance/sobriety OR an observed moving/equipment violation such as speeding). Vehicle pulls over safely.",
             operationalGuidance: [
-              "Activate emergency lights; position cruiser for tactical offset and lane protection.",
-              "Run plate via CPIC/PROS prior to approach to check registered owner status, stolen flags, and caution alerts.",
+              "Activate emergency lights; position cruiser/unit for tactical offset and lane protection.",
+              "Run plate via CPIC/PROS/MOVES prior to approach to check registered owner status, stolen flags, and caution alerts.",
               "Establish clear highway safety nexus upon approach."
             ],
             choices: [
@@ -437,7 +460,7 @@
             title: "Mandatory Alcohol Screening (MAS) & Sobriety Testing",
             threshold: "LAWFUL STOP + DEVICE ON HAND (CCC s. 320.27(2))",
             thresholdColor: "amber",
-            prompt: "If you have an Approved Screening Device (ASD) in your immediate possession during a lawful traffic stop, you may demand a breath sample WITHOUT reasonable suspicion of alcohol consumption. For SFST/drug screening, reasonable suspicion is required.",
+            prompt: "If you have an Approved Screening Device (ASD) in your immediate possession during a lawful traffic stop (and hold authority to make the demand), you may demand a breath sample WITHOUT reasonable suspicion of alcohol consumption. For SFST/drug screening, reasonable suspicion is required.",
             operationalGuidance: [
               "Confirm ASD calibration date and ensure device is immediately available ('forthwith').",
               "Read formal MAS Demand (CCC s. 320.27(2)) or Reasonable Suspicion ASD/SFST Demand (s. 320.27(1)).",
@@ -450,14 +473,14 @@
               { label: "Driver Refuses / Fails to Provide Sample → Arrest for Refusal", next: "ts_refusal_arrest" }
             ],
             statutes: [
-              { code: "Criminal Code s. 320.27(2) (MAS)", text: "If a peace officer has an approved screening device in their possession, they may demand a driver lawfully stopped provide a breath sample forthwith—no suspicion required." },
+              { code: "Criminal Code s. 320.27(2) (MAS)", text: "If an authorized peace officer has an approved screening device in their possession, they may demand a driver lawfully stopped provide a breath sample forthwith—no suspicion required." },
               { code: "Criminal Code s. 320.27(1)", text: "Where officer has reasonable suspicion of alcohol or drug in body, may demand SFST or ASD sample forthwith." },
               { code: "Criminal Code s. 320.15(1)", text: "Failure or refusal to comply with a lawful demand is a criminal offence carrying identical penalties to impaired driving." }
             ],
             cases: ["orbanski", "ladouceur"],
             articulation: [
               "Note exact time of stop, time ASD demand read, serial number/calibration date of ASD, and time sample provided.",
-              "If MAS is used, explicitly note the ASD was physically in your possession/cruiser at the moment of the demand."
+              "If MAS is used, explicitly note the ASD was physically in your possession/vehicle at the moment of the demand."
             ],
             traps: [
               "Delaying a MAS demand for 15 minutes to wait for another unit to bring an ASD invalidates the 'forthwith' requirement unless s. 10(b) counsel rights are provided."
@@ -549,7 +572,7 @@
             operationalGuidance: [
               "Arrest driver, handcuff/search incident to arrest for safety, read Charter s. 10(a)/(b) + Police Caution.",
               "Read formal Breathalyzer / Blood Demand (CCC s. 320.28) as soon as practicable.",
-              "Transport to detachment; provide private telephone access to counsel BEFORE collecting evidentiary breath samples."
+              "Transport to detachment/designated facility; provide private telephone access to counsel BEFORE collecting evidentiary breath samples."
             ],
             choices: [
               { label: "Conclude Processing & Issue Release / Appearance Notice", next: "ts_release" }
@@ -605,7 +628,7 @@
               { code: "Alberta TSA s. 94 & s. 173", text: "Driving while unauthorized/suspended; mandatory 30-day vehicle seizure." },
               { code: "Criminal Code s. 320.18", text: "Operation while prohibited under a Criminal Code order." }
             ],
-            cases: ["ladouceur", "caslake"],
+            cases: ["ladouceur", "caslake", "tim"],
             articulation: [
               "Confirm service/knowledge of suspension via registry abstract or prior officer endorsement."
             ],
@@ -730,7 +753,7 @@
             statutes: [
               { code: "Charter s. 7 & s. 9", text: "Right to silence and freedom from arbitrary detention." }
             ],
-            cases: ["suberu", "grant"],
+            cases: ["suberu", "grant", "singh"],
             articulation: [
               "Note time interaction ended and direction subject walked."
             ],
@@ -752,7 +775,7 @@
               { label: "New Objective Facts Create Reasonable Suspicion → Detain", next: "sd_mann" }
             ],
             statutes: [
-              { code: "Alberta Trespass to Premises Act / GLCA", text: "Specific provincial statutes grant limited authority to demand name/address where officer has reasonable grounds to believe a provincial trespass or liquor/cannabis offence occurred." }
+              { code: "Alberta Petty Trespass Act / GLCA", text: "Specific provincial statutes grant limited authority to demand name/address where officer has reasonable grounds to believe a provincial trespass or liquor/cannabis offence occurred." }
             ],
             cases: ["suberu", "grant"],
             articulation: [
@@ -851,7 +874,7 @@
               { code: "Criminal Code s. 495(1)", text: "Power of peace officer to arrest without warrant." },
               { code: "Common Law (Cloutier v. Langlois)", text: "Full search of person and immediate surroundings incident to lawful arrest." }
             ],
-            cases: ["mann", "golden", "fearon"],
+            cases: ["mann", "golden", "fearon", "oickle"],
             articulation: [
               "Document exact transition point from reasonable suspicion to RPG and re-reading of Charter rights."
             ],
@@ -1199,9 +1222,9 @@
       {
         id: "witnessed_arrest",
         code: "MOD-05",
-        title: "Witnessed Crime, Arrest & Post-Arrest Ladder",
-        subtitle: "CCC s.495(2) Public Interest / Charter s.10(b) / Cell Phones / Release Ladder",
-        badge: "CCC s.495 / s.498 / s.503",
+        title: "Witnessed Crime, Arrest, Statements & Release",
+        subtitle: "CCC s.495(2) / Voluntariness (Oickle) / Cell Phones / Release Ladder",
+        badge: "CCC s.495 / s.498 / Oickle",
         startNode: "wa_start",
         nodes: {
           wa_start: {
@@ -1251,14 +1274,15 @@
             ]
           },
           wa_arrest: {
-            title: "Arrest Execution & Charter s. 10(a)/(b) Duties",
-            threshold: "IMMEDIATE INFORMATIONAL & IMPLEMENTATIONAL DUTIES",
+            title: "Arrest Execution, s. 10(b) & Voluntariness (Oickle / Singh)",
+            threshold: "IMMEDIATE s. 10(b) + VOLUNTARY STATEMENTS",
             thresholdColor: "crimson",
-            prompt: "Inform subject they are under arrest and state the specific offence (s. 10(a)). Read Charter s. 10(b) and Primary Police Caution immediately.",
+            prompt: "Inform subject they are under arrest and state the specific offence (s. 10(a)). Read Charter s. 10(b) and Primary Police Caution immediately. Any statement to a person in authority must meet R. v. Oickle voluntariness.",
             operationalGuidance: [
               "Use only reasonable, necessary force to control and handcuff (CCC s. 25(1)).",
               "Ask clearly: 'Do you understand? Do you wish to call a lawyer?'",
-              "Once at detachment/phone, facilitate private contact with chosen counsel or 24-hr Legal Aid Duty Counsel BEFORE eliciting any statements ('hold-off' duty)."
+              "Once at detachment/phone, facilitate private contact with chosen counsel or 24-hr Legal Aid Duty Counsel BEFORE eliciting any statements ('hold-off' duty).",
+              "Under R. v. Oickle & R. v. Singh: avoid threats/promises (quid pro quo), oppressive conditions, or trickery that shocks the community; ensure suspect has an operating mind."
             ],
             choices: [
               { label: "Conduct Search Incident to Arrest (Person, Bags, Cell Phone Rules)", next: "wa_search_ita" }
@@ -1267,12 +1291,12 @@
               { code: "Charter s. 10(a) & s. 10(b)", text: "Informational duty (tell right to counsel/duty counsel) + Implementational duty (provide private phone access without delay and hold off questioning)." },
               { code: "Criminal Code s. 25(1) & s. 29(2)", text: "Must give notice of reason for arrest where feasible." }
             ],
-            cases: ["suberu", "grant", "tim"],
+            cases: ["suberu", "grant", "tim", "oickle", "singh"],
             articulation: [
-              "Record exact wording of arrest, time of s. 10(b) readout, prisoner's exact response, and exact times of counsel call."
+              "Record exact wording of arrest, time of s. 10(b) readout, prisoner's exact response, exact times of counsel call, and full verbatim context of any statements (including any prior inducements/cautions)."
             ],
             traps: [
-              "Questioning an arrestee in the back of the cruiser after they said 'Yes, I want a lawyer' violates the s. 10(b) hold-off obligation and will exclude their answers."
+              "Promising 'If you tell us where it is, we'll keep you out of custody' or questioning after a request for counsel violates Oickle and s. 10(b)."
             ]
           },
           wa_search_ita: {
@@ -1289,7 +1313,8 @@
               { label: "Search Complete → Apply Post-Arrest Release Ladder (CCC s. 498 / s. 503)", next: "wa_release_ladder" }
             ],
             statutes: [
-              { code: "Common Law (Cloutier / Fearon / Golden)", text: "Graduated privacy protections governing personal searches incident to arrest." }
+              { code: "Common Law (Cloutier / Fearon / Golden)", text: "Graduated privacy protections governing personal searches incident to arrest." },
+              { code: "Criminal Code s. 487 / s. 489", text: "Search warrants and plain-view seizure powers when going beyond narrow incident-to-arrest scope." }
             ],
             cases: ["fearon", "golden", "caslake"],
             articulation: [
@@ -1373,7 +1398,7 @@
               { code: "YCJA s. 25 & s. 26", text: "Right to counsel + mandatory parental notification upon arrest or detention." },
               { code: "YCJA s. 146(2)", text: "Strict statutory preconditions for admissibility of any oral or written statement made by a young person to a person in authority." }
             ],
-            cases: ["suberu", "grant"],
+            cases: ["suberu", "grant", "oickle"],
             articulation: [
               "Use an approved YCJA Youth Statement / Rights Form, video-record the entire rights explanation, and log time parent was notified."
             ],
@@ -1406,10 +1431,89 @@
             ]
           }
         }
+      },
+      {
+        id: "ab_cpo",
+        code: "MOD-07",
+        title: "Alberta Community Peace Officer (CPO) Authority",
+        subtitle: "Appointment Scope / Provincial Statutes / Municipal Bylaws / Police Hand-Off",
+        badge: "AB Peace Officer Act",
+        startNode: "cpo_start",
+        nodes: {
+          cpo_start: {
+            title: "Verify Appointment, Duty Status & Statutory Scope",
+            threshold: "APPOINTMENT-BOUND AUTHORITY (Peace Officer Act)",
+            thresholdColor: "purple",
+            prompt: "In Alberta, Community Peace Officers (CPOs) derive authority from their specific appointment under the Peace Officer Act, designated provincial enactments, municipal bylaws, and applicable Criminal Code peace officer provisions.",
+            operationalGuidance: [
+              "Confirm you are appointed, on duty, within your geographic jurisdiction, and acting within the specific enactments listed on your appointment.",
+              "Distinguish Level 1 (broader provincial traffic/regulatory scope per appointment) vs. Level 2 (typically narrower bylaw/specific provincial scope per appointment)."
+            ],
+            choices: [
+              { label: "Provincial Enactment / Bylaw Offence Within Appointment → Enforce", next: "cpo_prov_enf" },
+              { label: "Offence Outside Appointment / Criminal Investigation → Police Hand-Off", next: "cpo_police_handoff" }
+            ],
+            statutes: [
+              { code: "Alberta Peace Officer Act", text: "Governs employer authorization, officer appointment, training, oversight, complaints, and statutory scope of peace officers in Alberta." },
+              { code: "Alberta Municipal Government Act (MGA)", text: "Authorizes municipal bylaws and enforcement mechanisms within municipal boundaries." }
+            ],
+            cases: ["ladouceur", "mellenthin", "tim"],
+            articulation: [
+              "Note appointment level/terms, active duty status, and exact statute or bylaw section invoked."
+            ],
+            traps: [
+              "Acting outside your appointed legislation or outside your authorized territorial/duty limits can strip peace officer protection and expose you to civil/disciplinary or criminal liability."
+            ]
+          },
+          cpo_prov_enf: {
+            title: "Provincial & Bylaw Enforcement Action",
+            threshold: "STATUTORY AUTHORITY + CHARTER ss. 8–10",
+            thresholdColor: "sky",
+            prompt: "Enforcing an appointed provincial statute (e.g., TSA, GLCA, Petty Trespass Act) or municipal bylaw.",
+            operationalGuidance: [
+              "Use only the investigation, ticket/summons, seizure, or detention/arrest powers conferred by the governing statute and your appointment.",
+              "If a detention or arrest occurs, Charter ss. 9 and 10(a)/(b) still apply immediately."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Alberta Traffic Safety Act / GLCA / Petty Trespass Act", text: "Provincial regulatory and quasi-criminal authorities as specified by appointment." },
+              { code: "Charter ss. 8, 9, 10(a) & 10(b)", text: "Applies to state detention, searches, and rights readouts regardless of peace officer vs. police title." }
+            ],
+            cases: ["ladouceur", "mellenthin", "suberu", "grant"],
+            articulation: [
+              "Record exact statutory authority for stopping, demanding ID, seizing property, or detaining/arresting."
+            ],
+            traps: [
+              "Assuming a police-only power automatically applies to a CPO without checking the specific statute and appointment terms."
+            ]
+          },
+          cpo_police_handoff: {
+            title: "Out-of-Scope / Criminal Offence: Preserve & Hand Off to Police",
+            threshold: "SCENE PRESERVATION & JURISDICTIONAL BOUNDARY",
+            thresholdColor: "amber",
+            prompt: "You encounter a serious criminal offence or matter outside your peace officer appointment scope.",
+            operationalGuidance: [
+              "Prioritize life safety and scene/evidence preservation without overstepping statutory search or arrest limits.",
+              "Notify and transfer primary investigative control to municipal police or RCMP without delay."
+            ],
+            choices: [],
+            statutes: [
+              { code: "Alberta Peace Officer Act", text: "Peace officers operate within appointed mandates and coordinate with police services on broader criminal matters." },
+              { code: "Criminal Code s. 25(1) & s. 494/495", text: "Evaluate lawful authority carefully before taking physical custody or conducting searches." }
+            ],
+            cases: ["feeney", "tim"],
+            articulation: [
+              "Document exact time police were requested/notified, safety/scene steps taken, and time of transfer to police."
+            ],
+            traps: [
+              "Conducting an unauthorized dwelling search or prolonged custodial detention outside your appointed authority."
+            ]
+          }
+        }
       }
     ];
 
-    const STORAGE_KEY = "lexops_state_v1";
+    const STORAGE_KEY = "lexops_state_v2";
 
     const thresholdBadgeStyles = {
       emerald: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
@@ -1419,19 +1523,40 @@
       purple: "bg-purple-500/15 text-purple-300 border-purple-500/40"
     };
 
+    function defaultState() {
+      return {
+        scenarioId: "traffic_stop",
+        history: ["ts_start"],
+        inspectorTab: "statutes",
+        bookmarks: [],
+        checkedNotes: {},
+        customNotes: ""
+      };
+    }
+
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { scenarioId: "traffic_stop", history: ["ts_start"], inspectorTab: "statutes" };
+        if (!raw) return defaultState();
         const parsed = JSON.parse(raw);
         const sc = SCENARIOS.find(s => s.id === parsed.scenarioId) || SCENARIOS[0];
         const validHistory = Array.isArray(parsed.history) && parsed.history.length > 0 && parsed.history.every(id => Boolean(sc.nodes[id]))
           ? parsed.history
           : [sc.startNode];
         const validTab = ["statutes", "caselaw", "articulation"].includes(parsed.inspectorTab) ? parsed.inspectorTab : "statutes";
-        return { scenarioId: sc.id, history: validHistory, inspectorTab: validTab };
+        const validBookmarks = Array.isArray(parsed.bookmarks)
+          ? parsed.bookmarks.filter(b => b && SCENARIOS.some(s => s.id === b.scId && s.nodes[b.nodeId]))
+          : [];
+        return {
+          scenarioId: sc.id,
+          history: validHistory,
+          inspectorTab: validTab,
+          bookmarks: validBookmarks,
+          checkedNotes: parsed.checkedNotes && typeof parsed.checkedNotes === "object" ? parsed.checkedNotes : {},
+          customNotes: typeof parsed.customNotes === "string" ? parsed.customNotes : ""
+        };
       } catch {
-        return { scenarioId: "traffic_stop", history: ["ts_start"], inspectorTab: "statutes" };
+        return defaultState();
       }
     }
 
@@ -1462,6 +1587,31 @@
       const scenario = getCurrentScenario();
       const nodeId = state.history[state.history.length - 1];
       return { id: nodeId, data: scenario.nodes[nodeId] || scenario.nodes[scenario.startNode] };
+    }
+
+    function isCurrentBookmarked() {
+      const sc = getCurrentScenario();
+      const { id: nodeId } = getCurrentNode();
+      return state.bookmarks.some(b => b.scId === sc.id && b.nodeId === nodeId);
+    }
+
+    function toggleBookmarkCurrent() {
+      const sc = getCurrentScenario();
+      const { id: nodeId, data: node } = getCurrentNode();
+      const idx = state.bookmarks.findIndex(b => b.scId === sc.id && b.nodeId === nodeId);
+      if (idx >= 0) {
+        state.bookmarks.splice(idx, 1);
+      } else {
+        state.bookmarks.unshift({
+          scId: sc.id,
+          scCode: sc.code,
+          nodeId,
+          title: node.title
+        });
+      }
+      saveState();
+      renderBookmarks();
+      renderBookmarkButton();
     }
 
     function toggleDrawer(which) {
@@ -1550,6 +1700,13 @@
       renderInspector();
     }
 
+    function openCaseInIndex(caseTitle) {
+      openModal("caseIndexModal");
+      const filterEl = document.getElementById("caseFilterInput");
+      filterEl.value = caseTitle;
+      renderCaseIndex(caseTitle);
+    }
+
     function renderModuleList() {
       const container = document.getElementById("moduleList");
       document.getElementById("scenarioCount").textContent = `${SCENARIOS.length} MODULES`;
@@ -1571,6 +1728,36 @@
           </button>
         `;
       }).join("");
+    }
+
+    function renderBookmarks() {
+      const list = document.getElementById("bookmarkList");
+      const count = document.getElementById("bookmarkCount");
+      count.textContent = String(state.bookmarks.length);
+
+      if (state.bookmarks.length === 0) {
+        list.innerHTML = `<div class="text-[11px] text-slate-500 font-mono">Click ☆ SAVE to bookmark any step.</div>`;
+        return;
+      }
+
+      list.innerHTML = state.bookmarks.map(b => `
+        <button type="button" onclick="selectScenario('${escapeHtml(b.scId)}', '${escapeHtml(b.nodeId)}')"
+          class="w-full text-left p-2 rounded bg-tac-card hover:bg-tac-hover border border-tac-border transition block">
+          <div class="text-[10px] font-mono text-amber-400">${escapeHtml(b.scCode)}</div>
+          <div class="text-[11px] text-slate-200 font-medium truncate">${escapeHtml(b.title)}</div>
+        </button>
+      `).join("");
+    }
+
+    function renderBookmarkButton() {
+      const btn = document.getElementById("btnBookmark");
+      if (isCurrentBookmarked()) {
+        btn.textContent = "★ SAVED";
+        btn.className = "px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/60 text-xs font-mono font-semibold text-amber-300 transition";
+      } else {
+        btn.textContent = "☆ SAVE";
+        btn.className = "px-2.5 py-1 rounded bg-tac-card hover:bg-tac-hover border border-tac-border text-xs font-mono text-amber-300 transition";
+      }
     }
 
     function renderBreadcrumbs() {
@@ -1655,7 +1842,7 @@
               class="w-full text-left p-3.5 rounded-lg bg-tac-card hover:bg-tac-hover border border-tac-border hover:border-sky-400/60 transition group flex items-center justify-between gap-3">
               <div class="flex items-center gap-3 min-w-0">
                 <span class="w-6 h-6 rounded bg-tac-bg border border-tac-border group-hover:border-sky-400 group-hover:text-sky-400 font-mono text-xs flex items-center justify-center text-slate-400 shrink-0">
-                  ${String.fromCharCode(65 + idx)}
+                  ${idx + 1}
                 </span>
                 <span class="text-sm font-medium text-slate-100 group-hover:text-white">${escapeHtml(ch.label)}</span>
               </div>
@@ -1699,8 +1886,15 @@
       `;
     }
 
+    function toggleNoteCheck(noteKey) {
+      state.checkedNotes[noteKey] = !state.checkedNotes[noteKey];
+      saveState();
+      renderInspector();
+    }
+
     function renderInspector() {
-      const { data: node } = getCurrentNode();
+      const sc = getCurrentScenario();
+      const { id: nodeId, data: node } = getCurrentNode();
       const container = document.getElementById("inspectorContent");
 
       if (state.inspectorTab === "statutes") {
@@ -1724,8 +1918,11 @@
             const c = CASE_LIBRARY[key];
             if (!c) return "";
             return `
-              <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-1.5">
-                <div class="font-mono text-xs font-bold text-amber-400">${escapeHtml(c.title)}</div>
+              <div class="p-3.5 rounded-lg bg-tac-card border border-tac-border space-y-2">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="font-mono text-xs font-bold text-amber-400">${escapeHtml(c.title)}</span>
+                  <button type="button" onclick="openCaseInIndex('${escapeHtml(c.title)}')" class="text-[10px] font-mono text-sky-400 hover:underline shrink-0">INDEX ↗</button>
+                </div>
                 <div class="text-[10px] font-mono uppercase text-sky-400">${escapeHtml(c.topic)}</div>
                 <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(c.holding)}</p>
               </div>
@@ -1733,12 +1930,17 @@
           }).join("")}
         `;
       } else if (state.inspectorTab === "articulation") {
-        const notesHtml = node.articulation.map(n => `
-          <li class="flex items-start gap-2 text-xs text-slate-200">
-            <span class="text-emerald-400 font-mono font-bold">✓</span>
-            <span>${escapeHtml(n)}</span>
-          </li>
-        `).join("");
+        const notesHtml = node.articulation.map((n, idx) => {
+          const noteKey = `${sc.id}:${nodeId}:${idx}`;
+          const checked = Boolean(state.checkedNotes[noteKey]);
+          return `
+            <label class="flex items-start gap-2.5 text-xs text-slate-200 cursor-pointer select-none">
+              <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleNoteCheck('${escapeHtml(noteKey)}')"
+                class="mt-0.5 rounded border-slate-600 bg-tac-bg text-emerald-400 focus:ring-0">
+              <span class="${checked ? 'line-through text-slate-400' : ''}">${escapeHtml(n)}</span>
+            </label>
+          `;
+        }).join("");
 
         const trapsHtml = node.traps.length > 0
           ? node.traps.map(t => `
@@ -1752,10 +1954,15 @@
         container.innerHTML = `
           <div class="space-y-4">
             <div>
-              <div class="text-[11px] font-mono uppercase text-emerald-400 font-semibold mb-2">Mandatory Notebook Articulation</div>
-              <ul class="space-y-2 bg-tac-card border border-tac-border rounded-lg p-3.5">
+              <div class="text-[11px] font-mono uppercase text-emerald-400 font-semibold mb-2">Notebook Articulation Checklist</div>
+              <div class="space-y-2.5 bg-tac-card border border-tac-border rounded-lg p-3.5">
                 ${notesHtml}
-              </ul>
+              </div>
+            </div>
+            <div>
+              <label for="customFieldNotes" class="block text-[11px] font-mono uppercase text-sky-400 font-semibold mb-1.5">Custom Field / Drill Notes</label>
+              <textarea id="customFieldNotes" rows="3" placeholder="Times, observations, grounds, or scenario notes..."
+                class="w-full bg-tac-card border border-tac-border rounded-lg p-2.5 text-xs font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-400">${escapeHtml(state.customNotes)}</textarea>
             </div>
             <div>
               <div class="text-[11px] font-mono uppercase text-red-400 font-semibold mb-2">Pitfalls &amp; Exclusion Risks</div>
@@ -1765,11 +1972,21 @@
             </div>
           </div>
         `;
+
+        const customEl = document.getElementById("customFieldNotes");
+        if (customEl) {
+          customEl.addEventListener("input", (e) => {
+            state.customNotes = e.target.value;
+            saveState();
+          });
+        }
       }
     }
 
     function renderAll() {
       renderModuleList();
+      renderBookmarks();
+      renderBookmarkButton();
       renderBreadcrumbs();
       renderCenterNode();
       renderInspector();
@@ -1830,9 +2047,18 @@
           lines.push(`CASE LAW: ${n.cases.map(k => CASE_LIBRARY[k]?.title).filter(Boolean).join(" | ")}`);
         }
         lines.push("ARTICULATION CHECKLIST:");
-        n.articulation.forEach(a => lines.push(`  - ${a}`));
+        n.articulation.forEach((a, aIdx) => {
+          const mark = state.checkedNotes[`${sc.id}:${nodeId}:${aIdx}`] ? "[x]" : "[ ]";
+          lines.push(`  ${mark} ${a}`);
+        });
         lines.push("------------------------------------------------------------");
       });
+
+      if (state.customNotes.trim()) {
+        lines.push("");
+        lines.push("CUSTOM FIELD / DRILL NOTES:");
+        lines.push(state.customNotes.trim());
+      }
 
       document.getElementById("exportTextarea").value = lines.join("\n");
       openModal("exportModal");
@@ -1866,7 +2092,7 @@
             const caseTitles = (node.cases || []).map(k => CASE_LIBRARY[k]?.title || k).join(" ");
             const statuteText = node.statutes.map(s => `${s.code} ${s.text}`).join(" ");
             const matchedIn = [];
-            if (`${node.title} ${node.prompt} ${node.threshold}`.toLowerCase().includes(q)) matchedIn.push("NODE");
+            if (`${sc.title} ${node.title} ${node.prompt} ${node.threshold}`.toLowerCase().includes(q)) matchedIn.push("NODE");
             if (statuteText.toLowerCase().includes(q)) matchedIn.push("STATUTE");
             if (caseTitles.toLowerCase().includes(q)) matchedIn.push("CASE");
 
@@ -1923,9 +2149,41 @@
     bindSearch(document.getElementById("mobileSearch"), document.getElementById("mobileSearchResults"));
 
     document.addEventListener("keydown", (e) => {
+      const tag = document.activeElement?.tagName;
+      const isTyping = tag === "INPUT" || tag === "TEXTAREA";
+
       if (e.key === "Escape") {
         ["charterModal", "groundsModal", "caseIndexModal", "exportModal"].forEach(closeModal);
         closeAllDrawers();
+        return;
+      }
+
+      if (isTyping) return;
+
+      if (e.key === "/") {
+        e.preventDefault();
+        const desktopSearch = document.getElementById("globalSearch");
+        const mobileSearch = document.getElementById("mobileSearch");
+        if (window.innerWidth >= 768 && desktopSearch) desktopSearch.focus();
+        else if (mobileSearch) mobileSearch.focus();
+        return;
+      }
+
+      if (e.key === "Backspace") {
+        if (state.history.length > 1) {
+          e.preventDefault();
+          stepBack();
+        }
+        return;
+      }
+
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= 9) {
+        const { data: node } = getCurrentNode();
+        if (node.choices && node.choices[num - 1]) {
+          e.preventDefault();
+          chooseBranch(node.choices[num - 1].next);
+        }
       }
     });
 
